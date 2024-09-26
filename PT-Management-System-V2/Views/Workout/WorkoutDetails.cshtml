@@ -1,0 +1,108 @@
+﻿@* @model PT_Management_System_V2.Models.WorkoutExercisesModel *@
+@model IEnumerable<PT_Management_System_V2.Models.WorkoutExercisesModel>
+<link rel="stylesheet" href="~/css/workoutDetails.css" />
+
+
+
+@* <input type="hidden" id="hiddenModelData" data-value="@myData" /> *@
+@* <input type="hidden" id="hiddenModelData" value="@Html.Raw(itemsJson)" /> *@
+@* <input type="hidden" id="message" value="@ViewBag.ModelData" /> *@
+
+<p>
+    Details of workout Page
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+@*             <th>
+                @Html.DisplayNameFor(model => model.WorkoutDate)
+            </th> *@
+@*             <th>
+                @Html.DisplayNameFor(model => model.WorkoutDuration)
+            </th> *@
+@*             <th>
+                @Html.DisplayNameFor(model => model.WorkoutCreatedAt)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseGroupId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MuscleGroup)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SetId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reps)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SetCategory)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+            @* let WorkoutData = ; *@
+            <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+@*             <td>
+                @Html.DisplayFor(modelItem => item.WorkoutDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkoutDuration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkoutCreatedAt)
+            </td> *@
+
+            <td>
+                @Html.DisplayFor(modelItem => item.ExerciseName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExerciseGroupId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MuscleGroup)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ExerciseDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SetId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Reps)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Weight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SetCategory)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.WorkoutId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.WorkoutId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.WorkoutId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+<script src="~/js/workout_WorkoutDetails.js"></script>

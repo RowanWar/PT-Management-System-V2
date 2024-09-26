@@ -1,0 +1,66 @@
+﻿<!-- Expects a list of type ClientModel-->
+@model IEnumerable<PT_Management_System_V2.Models.ClientModel>
+
+    <p>
+        <a asp-action"Create">Your active clients</a>
+    </p>
+
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClientUserId)
+                </th>
+                <td>
+                    @Html.DisplayNameFor(model => model.ClientUsername)
+                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClientFirstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClientLastName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClientEmail)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ClientPhone)
+                </th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @* The user_id of the client, NOT the client_id *@
+                            @Html.DisplayFor(modelItem => item.ClientUserId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClientUsername)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClientFirstName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClientLastName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClientEmail)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClientPhone)
+                        </td>
+
+                        <td>
+                            @Html.ActionLink("View Check-ins", "WeeklyReport", new { item.ClientUserId })
+                            @Html.ActionLink("View Workouts", "ClientWorkouts", new { item.ClientUserId })
+                            @Html.ActionLink("Delete", "Delete", new { item.ClientUserId })
+                        </td>
+                    </tr>
+                }
+        </tbody>
+    </table>

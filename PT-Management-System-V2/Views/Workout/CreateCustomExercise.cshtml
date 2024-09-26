@@ -1,0 +1,49 @@
+﻿@model PT_Management_System_V2.Models.WorkoutExercisesModel
+
+<h4>WorkoutExercisesModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="View">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+@*             <div class="form-group">
+                <label asp-for="UserId" class="control-label"></label>
+                <input asp-for="UserId" class="form-control" />
+                <span asp-validation-for="UserId" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <label asp-for="ExerciseGroupId" class="control-label"></label>
+                <input asp-for="ExerciseGroupId" class="form-control" />
+                <span asp-validation-for="ExerciseGroupId" class="text-danger"></span>
+            </div>
+@*             <div class="form-group">
+                <label asp-for="WorkoutName" class="control-label"></label>
+                <input asp-for="WorkoutName" class="form-control" />
+                <span asp-validation-for="WorkoutName" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <label asp-for="ExerciseName" class="control-label"></label>
+                <input asp-for="ExerciseName" class="form-control" />
+                <span asp-validation-for="ExerciseName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MuscleGroup" class="control-label"></label>
+                <input asp-for="MuscleGroup" class="form-control" />
+                <span asp-validation-for="MuscleGroup" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExerciseDescription" class="control-label"></label>
+                <input asp-for="ExerciseDescription" class="form-control" />
+                <span asp-validation-for="ExerciseDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

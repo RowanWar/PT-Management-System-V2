@@ -1,0 +1,143 @@
+﻿@model IEnumerable<PT_Management_System_V2.Models.CoachModel>
+<link rel="stylesheet" href="~/css/profileIndex.css" />
+
+
+<h1>
+    Your Profile
+</h1>
+
+@* Make these text boxes and then the edit profile mode will enable/disable this functionality.  *@
+For the photo, add an on click event listener to it for uploading.
+<div class="container mt-5">
+
+    <div class="row d-flex justify-content-center">
+
+        <div class="col-md-7">
+
+            <div class="card p-3 py-4 profileContainerDiv">
+
+                <div class="text-center editable">
+                    <img src="https://i.imgur.com/bDLhJiP.jpg" width="100" class="rounded-circle">
+                </div>
+
+                <div class="text-center mt-3 editable">
+                    <span class="bg-secondary p-1 px-4 rounded text-white">Pro</span>
+                    <h5 class="mt-2 mb-0">Alexender Schidmt</h5>
+                    <span>UI/UX Designer</span>
+
+                    <div class="px-4 mt-1">
+                        <p class="fonts">Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. </p>
+
+                    </div>
+
+                    <ul class="social-list">
+                        <li><i class="fa fa-facebook"></i></li>
+                        <li><i class="fa fa-dribbble"></i></li>
+                        <li><i class="fa fa-instagram"></i></li>
+                        <li><i class="fa fa-linkedin"></i></li>
+                        <li><i class="fa fa-google"></i></li>
+                    </ul>
+
+                    <div class="buttons">
+
+                        <button class="btn btn-outline-primary px-4">Message</button>
+                        <button class="btn btn-primary px-4 ms-3">Contact</button>
+                    </div>
+
+
+                </div>
+
+
+
+                
+            </div>
+
+            <button class="btn btn-primary px-4 ms-5" onclick="buttonClicked()">Edit Profile</button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CoachId)
+            </th>
+        </tr>
+
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CoachClientId)
+            </th>
+        </tr>
+
+            <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.CoachProfileDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CoachQualifications)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserEmail)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoB)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CoachId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CoachClientId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CoachProfileDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CoachQualifications)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserEmail)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoB)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.CoachId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.CoachId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.CoachId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<script src="~/js/profileIndex.js"></script>

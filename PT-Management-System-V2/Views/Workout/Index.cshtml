@@ -1,0 +1,47 @@
+﻿@model IEnumerable<PT_Management_System_V2.Models.WorkoutExerciseModel>
+
+<p>
+    <a asp-action="CreateWorkout">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkoutDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Duration)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WorkoutDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Duration)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.WorkoutId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.WorkoutId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.WorkoutId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,94 @@
+﻿body {
+}
+
+/*.table {
+    border-spacing: 50px;
+    padding: 50px;
+}*/
+
+#activeWorkoutContainer {
+    font-size: 1.2em;
+    text-align: center;
+    width: 30em;
+}
+
+
+#activeWorkoutTable {
+    width: 100%;
+
+}
+
+.headerRow {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 3em;
+    border-top: 0.1px dotted red;
+    border-left: 0.1px dotted red;
+    border-right: 0.1px dotted red;
+}
+
+.headerRow>td {
+    padding-bottom: 0.2em;
+    padding-left: 0em;
+}
+
+.exerciseRow {
+    padding-top: 100px;
+}
+
+.exerciseRow>td {
+    padding-left: 2em;
+}
+/*tr {*/
+/*    border: 0.1px dotted red;
+*//*}*/
+
+#submitExerciseBtn {
+    width: 100%;
+    height: 4em;
+    margin-top: 1.5em;
+    color: red;
+    border-radius: 1em;
+    border-style: dotted;
+    border: 0;
+}
+
+.timer-container {
+    text-align: center;
+}
+
+#countdown-timer {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+#start-button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+    #start-button:hover {
+        background-color: #218838;
+    }
+
+
+.setButton {
+    width: 2em;
+    height: 1em;
+}
+
+.setComplete {
+    background-color: lightgreen;
+}
+
+.deleteSetButton {
+    width: 2em;
+    height: 2em;
+    margin-left: 2em;
+}

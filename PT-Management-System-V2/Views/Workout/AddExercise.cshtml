@@ -1,0 +1,58 @@
+﻿@model PT_Management_System_V2.Models.WorkoutExercisesModel
+
+<h4>WorkoutExercisesModel</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="View" id="exerciseForm">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="ExerciseName" class="control-label"></label>
+                <input asp-for="ExerciseName" class="form-control" id="exerciseName" />
+                <span asp-validation-for="ExerciseName" class="text-danger"></span>
+            </div>
+@*             <div class="form-group">
+                <label asp-for="MuscleGroup" class="control-label"></label>
+                <input asp-for="MuscleGroup" class="form-control" />
+                <span asp-validation-for="MuscleGroup" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <label asp-for="ExerciseDescription" class="control-label"></label>
+                <input asp-for="ExerciseDescription" class="form-control" id="exerciseDesc" />
+                <span asp-validation-for="ExerciseDescription" class="text-danger"></span>
+            </div>
+@*             <div class="form-group">
+                <label asp-for="SetId" class="control-label"></label>
+                <input asp-for="SetId" class="form-control" />
+                <span asp-validation-for="SetId" class="text-danger"></span>
+            </div> *@
+@*             <div class="form-group">
+                <label asp-for="SetReps" class="control-label"></label>
+                <input asp-for="SetReps" class="form-control" />
+                <span asp-validation-for="SetReps" class="text-danger"></span>
+            </div> *@
+@*             <div class="form-group">
+                <label asp-for="SetWeight" class="control-label"></label>
+                <input asp-for="SetWeight" class="form-control" />
+                <span asp-validation-for="SetWeight" class="text-danger"></span>
+            </div> *@
+@*             <div class="form-group">
+                <label asp-for="SetCategory" class="control-label"></label>
+                <input asp-for="SetCategory" class="form-control" />
+                <span asp-validation-for="SetCategory" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <input type="submit" value="Add Exercise" class="btn btn-primary" id="addExerciseBtn" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+    <a asp-action="CreateCustomExercise">Create a custom exercise</a>
+</div>
+
+
+<script src="~/js/workout_AddExercise.js"></script>

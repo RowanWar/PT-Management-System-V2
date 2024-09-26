@@ -1,0 +1,14 @@
+﻿body {
+}
+
+/*.table {
+    border-spacing: 50px;
+    padding: 50px;
+}*/
+
+.child-hidden-row {
+    padding: 10em;
+    color: red;
+    border-style: dotted;
+    border: 0;
+}
