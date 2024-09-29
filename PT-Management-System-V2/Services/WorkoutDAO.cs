@@ -23,15 +23,10 @@ namespace PT_Management_System_V2.Services
         }
 
 
-        public List<WorkoutModel> GetAllWorkouts()
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<WorkoutModel> GetAllWorkoutsByUserId(int UserId)
+        public List<WorkoutExerciseModel> GetAllWorkoutsByUserId(int UserId)
         {
             {
-                List<WorkoutModel> foundWorkouts = new List<WorkoutModel>();
+                List<WorkoutExerciseModel> foundWorkouts = new List<WorkoutExerciseModel>();
 
                 string sqlStatement = "SELECT * FROM workout WHERE user_id = @UserId";
 
@@ -57,7 +52,7 @@ namespace PT_Management_System_V2.Services
                                 while (result.Read())
                                 {
                                     //val = (int)result.GetValue(0);
-                                    foundWorkouts.Add(new WorkoutModel
+                                    foundWorkouts.Add(new WorkoutExerciseModel
                                     {
                                         WorkoutId = (int)result["workout_id"],
                                         UserId = (int)result["user_id"],
@@ -92,6 +87,13 @@ namespace PT_Management_System_V2.Services
                 }
             }
         }
+
+
+        public List<WorkoutModel> GetAllWorkouts()
+        {
+            throw new NotImplementedException();
+        }
+
 
 
 

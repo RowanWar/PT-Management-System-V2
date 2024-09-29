@@ -10,6 +10,8 @@ namespace PT_Management_System_V2.Models
 
         public int UserId { get; set; }
 
+        public string WorkoutName { get; set; }
+
         public List<WorkoutExercise>? WorkoutExercises { get; set; }
 
         public DateTime WorkoutDate { get; set; }

@@ -5,8 +5,15 @@ namespace PT_Management_System_V2.Services
 {
     public class ClientDAO : IClientDataService
     {
-        // Need to switch this to Secrets as well same as WorkoutDAO.
-        string dbConnectionString = @"Host=localhost;Username=postgres;Password=*;Database=ptsystem;Pooling=true;Minimum Pool Size=1;Maximum Pool Size=20;";
+
+        private readonly string _dbConnectionString;
+
+        public ClientDAO(string dbConnectionString)
+        {
+            _dbConnectionString = dbConnectionString;
+
+        }
+
 
         public int Delete(ClientModel client)
         {
@@ -20,7 +27,7 @@ namespace PT_Management_System_V2.Services
             string sqlStatement = "SELECT * FROM users";
 
 
-            using (var connection = new NpgsqlConnection(dbConnectionString))
+            using (var connection = new NpgsqlConnection(_dbConnectionString))
             {
                 try
                 {
@@ -50,9 +57,6 @@ namespace PT_Management_System_V2.Services
                                     ClientPhone = (string)result["mobile_number"]
                          
                                 });
-
-                                //result.GetString(1));
-
                             }
                         }
                         else
