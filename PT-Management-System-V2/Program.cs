@@ -15,7 +15,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
 builder.Services.AddSingleton<ClientDAO>(provider => new ClientDAO(connectionString));
-//builder.Services.AddScoped<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
