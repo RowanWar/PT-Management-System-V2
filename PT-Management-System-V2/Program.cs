@@ -4,11 +4,9 @@ using PT_Management_System_V2.Data;
 using PT_Management_System_V2.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-//var connectionString = builder.Configuration.GetConnectionString("ApplicationDbContextConnection") ?? throw new InvalidOperationException("Connection string 'ApplicationDbContextConnection' not found.");
 
-// Add services to the container.
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-var connectionString = builder.Configuration["ConnectionStrings:PtSystemDb"];
+var connectionString = builder.Configuration["ConnectionStrings:PtSystemDb"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
