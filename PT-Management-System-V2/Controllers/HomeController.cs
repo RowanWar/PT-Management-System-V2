@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using PT_Management_System_V2.Models;
 using System.Diagnostics;
 using Npgsql;
+using Microsoft.AspNetCore.Authorization;
 //using PT_Management_System_V2.Helpers;
 
 namespace PT_Management_System_V2.Controllers
@@ -22,6 +23,7 @@ namespace PT_Management_System_V2.Controllers
             return View();
         }
 
+        [Authorize]
         public IActionResult Privacy()
         {
             ViewBag.Message = "Security is important";
