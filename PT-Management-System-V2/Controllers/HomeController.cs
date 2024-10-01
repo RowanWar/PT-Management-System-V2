@@ -18,9 +18,8 @@ namespace PT_Management_System_V2.Controllers
 
         public IActionResult Index()
         {
-            //string username = Npgsql. 
-            //UserHelper.ConnectDB();
             return View();
+
         }
 
         [Authorize]
@@ -30,6 +29,7 @@ namespace PT_Management_System_V2.Controllers
             ViewBag.MyFavouriteColor = "Green";
             return View();
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

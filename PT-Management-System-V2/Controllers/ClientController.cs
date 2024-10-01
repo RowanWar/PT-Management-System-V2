@@ -26,10 +26,18 @@ namespace PT_Management_System_V2.Controllers
         //static List<ClientModel> clients = new List<ClientModel>();
         public IActionResult Index()
         {
-            //ClientDAO clients = new ClientDAO(null);
+            if (User.Identity.IsAuthenticated)
+            {
+                // The user is authenticated, show user-specific data
+                return Json("User is authenticated");
+            }
+            else
+            {
+                // Redirect to login or show guest content
+                return Json("User is not authenticated");
+            }
 
-            return View(_clientDAO.GetAllClients());
-            //return View();
+            //return View(_clientDAO.GetAllClients());
         }
 
         // Displays a list of all workouts performed by a specific user based upon their UserId in the DB.
