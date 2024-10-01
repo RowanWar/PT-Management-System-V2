@@ -29,7 +29,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 
-// Add JWT Authentication
+// Authentication is handled by JWT exclusively
 builder.Services.AddAuthentication(options =>
 {
     // Default authentication scheme is set to cookies only for user account logins
@@ -54,7 +54,25 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = "Issuer", 
         ValidAudience = "Audience", 
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SigningKey"))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SigningKey")) // Maybe SecretKey?
+    };
+
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            var error = context.Exception;
+            // Log or inspect the error here
+            System.Diagnostics.Debug.WriteLine($"JWT Authentication failed: {error.Message}");
+            return Task.CompletedTask;
+        },
+        OnChallenge = context =>
+        {
+            // If token is invalid, OnChallenge will be triggered
+            System.Diagnostics.Debug.WriteLine("JWT Bearer token is invalid or missing.");
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -99,14 +117,14 @@ builder.Services.ConfigureApplicationCookie(options =>
         // Generate JWT token
         var token = await jwtTokenService.GenerateToken(user);
 
-        // Here, you could add the token to the response header or body as per your use case
+        // Adds the generated JWT as a response header to the login response
         context.HttpContext.Response.Headers.Add("Authorization", "Bearer " + token);
 
         await Task.CompletedTask;
     };
     // Cookie settings
     options.Cookie.HttpOnly = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+    options.ExpireTimeSpan = TimeSpan.FromDays(14);
 
     options.LoginPath = "/Identity/Account/Login";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
@@ -134,7 +152,7 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-//app.UseRouting();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

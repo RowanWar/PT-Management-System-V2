@@ -2,7 +2,9 @@
 using PT_Management_System_V2.Models;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using PT_Management_System_V2.Services;
-using System.Text.Json; // Might be redundant
+using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization; // Might be redundant
 namespace PT_Management_System_V2.Controllers
 {
     public class ClientController : Controller
@@ -18,26 +20,16 @@ namespace PT_Management_System_V2.Controllers
         {
             _workoutDAO = workoutDAO;
             _clientDAO = clientDAO;
-        } 
+        }
 
 
 
         // Create a list out of the client model so the forEach in the index.cshtml can iterate through all the clients properly.
         //static List<ClientModel> clients = new List<ClientModel>();
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult Index()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                // The user is authenticated, show user-specific data
-                return Json("User is authenticated");
-            }
-            else
-            {
-                // Redirect to login or show guest content
-                return Json("User is not authenticated");
-            }
-
-            //return View(_clientDAO.GetAllClients());
+            return View(_clientDAO.GetAllClients());
         }
 
         // Displays a list of all workouts performed by a specific user based upon their UserId in the DB.

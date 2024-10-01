@@ -26,10 +26,6 @@ public class JwtTokenService
             new Claim(ClaimTypes.NameIdentifier, user.Id)
         };
 
-        // Include user roles (if you're using roles)
-        //var roles = await _userManager.GetRolesAsync(user);
-        //claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
-
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
@@ -37,7 +33,8 @@ public class JwtTokenService
             issuer: _configuration["JwtSettings:Issuer"],
             audience: _configuration["JwtSettings:Audience"],
             claims: claims,
-            expires: DateTime.Now.AddHours(1),
+            // Set to 30m for now, should be 2m for production
+            expires: DateTime.Now.AddMinutes(30),
             signingCredentials: creds
         );
 
