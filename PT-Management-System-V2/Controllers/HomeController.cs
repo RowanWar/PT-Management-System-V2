@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using PT_Management_System_V2.Models;
 using System.Diagnostics;
 using Npgsql;
-//using PT_Management_System_V2.Helpers;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace PT_Management_System_V2.Controllers
 {
@@ -17,17 +18,18 @@ namespace PT_Management_System_V2.Controllers
 
         public IActionResult Index()
         {
-            //string username = Npgsql. 
-            //UserHelper.ConnectDB();
             return View();
+
         }
 
+        [Authorize]
         public IActionResult Privacy()
         {
             ViewBag.Message = "Security is important";
             ViewBag.MyFavouriteColor = "Green";
             return View();
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
