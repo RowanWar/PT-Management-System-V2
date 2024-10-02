@@ -10,6 +10,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Grabs the signing key data from appsettings.json (should be moved for production) for use to validate the JWT when authing to protected JWT api endpoints
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var connectionString = builder.Configuration["ConnectionStrings:PtSystemDb"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 
@@ -52,9 +54,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        ValidIssuer = "Issuer", 
-        ValidAudience = "Audience", 
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SigningKey")) // Maybe SecretKey?
+        ValidIssuer = jwtSettings["Issuer"], 
+        ValidAudience = jwtSettings["Audience"], 
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["SecretKey"])) 
     };
 
 

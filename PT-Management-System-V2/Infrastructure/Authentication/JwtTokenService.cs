@@ -26,6 +26,7 @@ public class JwtTokenService
             new Claim(ClaimTypes.NameIdentifier, user.Id)
         };
 
+        // Grabs the key from appsettings for now whilst in dev. This will be changed to env variables for prod.
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
