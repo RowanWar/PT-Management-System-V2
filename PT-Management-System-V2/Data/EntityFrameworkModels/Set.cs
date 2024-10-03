@@ -23,3 +23,13 @@ public partial class Set
 
     public virtual WorkoutExercise? WorkoutExercise { get; set; }
 }
+
+
+public class ClientCoach
+{
+    public Client client { get; set; }
+
+    public Coach coach { get; set; }
+
+
+}
