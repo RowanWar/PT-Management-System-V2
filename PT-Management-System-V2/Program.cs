@@ -21,6 +21,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
 builder.Services.AddSingleton<ClientDAO>(provider => new ClientDAO(connectionString));
+// Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();
 
 
