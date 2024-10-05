@@ -27,7 +27,7 @@ builder.Services.AddScoped<JwtTokenService>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -111,7 +111,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnSigningIn = async context =>
     {
-        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
         var jwtTokenService = context.HttpContext.RequestServices.GetRequiredService<JwtTokenService>();
 
         // Get the user

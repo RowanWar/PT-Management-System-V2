@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using PT_Management_System_V2.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,9 +10,9 @@ namespace PT_Management_System_V2.Infrastructure.Authentication;
 public class JwtTokenService
 {
     private readonly IConfiguration _configuration;
-    private readonly UserManager<IdentityUser> _userManager;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public JwtTokenService(IConfiguration configuration, UserManager<IdentityUser> userManager)
+    public JwtTokenService(IConfiguration configuration, UserManager<ApplicationUser> userManager)
     {
         _configuration = configuration;
         _userManager = userManager;

@@ -6,12 +6,8 @@ using PT_Management_System_V2.Data.EntityFrameworkModels;
 
 namespace PT_Management_System_V2.Data;
 
-public partial class ApplicationDbContext : IdentityDbContext
+public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
-    public ApplicationDbContext()
-    {
-
-    }
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)

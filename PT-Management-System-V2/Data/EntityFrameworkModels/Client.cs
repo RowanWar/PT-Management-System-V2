@@ -7,6 +7,9 @@ public partial class Client
 {
     public int ClientId { get; set; }
 
+    // Foreign key to AspNetUser (Id)
+    //public string UserId { get; set; }
+
     public bool? ContactByPhone { get; set; }
 
     public bool? ContactByEmail { get; set; }
