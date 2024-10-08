@@ -62,9 +62,9 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<WorkoutExercise> WorkoutExercises { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=BeBetter30;Database=ptsystem");
+//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//        => optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=BeBetter30;Database=ptsystem");
 
     // Modelbuilder is for the purpose of Entity Framework Core to know the relationship and how to map entities to the database
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -76,7 +76,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // Identity modelbuilders
         modelBuilder.Entity<AspNetRole>(entity =>
         {
-            entity.ToTable("AspNetRoles", "identity");
+            entity.ToTable("AspNetRoles", "public");
 
             entity.HasIndex(e => e.NormalizedName, "RoleNameIndex").IsUnique();
 
@@ -87,7 +87,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<AspNetRoleClaim>(entity =>
         {
-            entity.ToTable("AspNetRoleClaims", "identity");
+            entity.ToTable("AspNetRoleClaims", "public");
 
             entity.HasIndex(e => e.RoleId, "IX_AspNetRoleClaims_RoleId");
 
@@ -97,14 +97,20 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<AspNetUser>(entity =>
         {
-            entity.ToTable("AspNetUsers", "identity");
+            entity.ToTable("AspNetUsers", "public");
 
             entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
-
             entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex").IsUnique();
 
+            entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.LastName).HasMaxLength(50);
+            entity.Property(e => e.AccountActive).HasDefaultValue(true);
+            entity.Property(e => e.DateCreated)
+                .HasColumnType("timestamp with time zone")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+
             entity.Property(e => e.Email).HasMaxLength(256);
-            //entity.Property(e => e.Initials).HasMaxLength(5);
             entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
             entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
             entity.Property(e => e.UserName).HasMaxLength(256);
@@ -122,35 +128,10 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                     });
         });
 
-        //modelBuilder.Entity<AspNetUser>(entity =>
-        //{
-        //    entity.ToTable("AspNetUsers");
-
-        //    entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
-
-        //    entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex").IsUnique();
-
-        //    entity.Property(e => e.Email).HasMaxLength(256);
-        //    entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
-        //    entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
-        //    entity.Property(e => e.UserName).HasMaxLength(256);
-
-        //    entity.HasMany(d => d.Roles).WithMany(p => p.Users)
-        //        .UsingEntity<Dictionary<string, object>>(
-        //            "AspNetUserRole1",
-        //            r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
-        //            l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
-        //            j =>
-        //            {
-        //                j.HasKey("UserId", "RoleId");
-        //                j.ToTable("AspNetUserRoles");
-        //                j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
-        //            });
-        //});
 
         modelBuilder.Entity<AspNetUserClaim>(entity =>
         {
-            entity.ToTable("AspNetUserClaims", "identity");
+            entity.ToTable("AspNetUserClaims", "public");
 
             entity.HasIndex(e => e.UserId, "IX_AspNetUserClaims_UserId");
 
@@ -162,7 +143,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         {
             entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
 
-            entity.ToTable("AspNetUserTokens", "identity");
+            entity.ToTable("AspNetUserTokens", "public");
 
             entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
         });

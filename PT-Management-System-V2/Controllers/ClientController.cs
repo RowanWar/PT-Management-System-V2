@@ -37,13 +37,13 @@ namespace PT_Management_System_V2.Controllers
         //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult TestEndpoint()
         {
-            // Use _context (injected via DI) to query Users
+
             //var clientNames = _context.AspNetUsers
-            //    .Select(u => u.UserName)
+            //    .Select(u => u.Id)
             //    .ToList();
             var clientNames = _context.AspNetUsers
                 .Select(
-                    u => new { u.UserName, u.FirstName, u.LastName }
+                    u => new { u.UserName, u.FirstName, u.LastName, u.AccountActive, u.Id, }
                 )
                 .ToList();
 
