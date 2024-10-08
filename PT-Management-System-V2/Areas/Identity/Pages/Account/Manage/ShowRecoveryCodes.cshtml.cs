@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using PT_Management_System_V2.Data;
 
 namespace PT_Management_System_V2.Areas.Identity.Pages.Account.Manage
 {

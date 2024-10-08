@@ -21,12 +21,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
 builder.Services.AddSingleton<ClientDAO>(provider => new ClientDAO(connectionString));
+// Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();
 
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
@@ -110,12 +111,12 @@ builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Events.OnSigningIn = async context =>
     {
-        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<IdentityUser>>();
+        var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
         var jwtTokenService = context.HttpContext.RequestServices.GetRequiredService<JwtTokenService>();
 
         // Get the user
         var user = await userManager.GetUserAsync(context.Principal);
-
+        System.Diagnostics.Debug.WriteLine(user.Id);
         // Generate JWT token
         var token = await jwtTokenService.GenerateToken(user);
 

@@ -4,20 +4,22 @@ using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using PT_Management_System_V2.Services;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization; // Might be redundant
+using Microsoft.AspNetCore.Authorization;
+using PT_Management_System_V2.Data; // Might be redundant
 namespace PT_Management_System_V2.Controllers
 {
     public class ClientController : Controller
     {
-
-        //WorkoutDAO WorkoutDAO = new WorkoutDAO(null);
-
+        // Uses DI to bring in DB context
+        private readonly ApplicationDbContext _context;
+        
         private readonly WorkoutDAO _workoutDAO;
         private readonly ClientDAO _clientDAO;
 
         // Uses Dependency Injection to implement both WorkoutDAO and ClientDAO. Currently a lot of functionality for this controller is implemented through WorkoutDAO.
-        public ClientController(WorkoutDAO workoutDAO, ClientDAO clientDAO)
+        public ClientController(ApplicationDbContext context, WorkoutDAO workoutDAO, ClientDAO clientDAO)
         {
+            _context = context;
             _workoutDAO = workoutDAO;
             _clientDAO = clientDAO;
         }
@@ -30,6 +32,17 @@ namespace PT_Management_System_V2.Controllers
         public IActionResult Index()
         {
             return View(_clientDAO.GetAllClients());
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public IActionResult TestEndpoint()
+        {
+            // Use _context (injected via DI) to query Users
+            var clientNames = _context.Users
+                .Select(u => u.Username)
+                .ToList();
+
+            return Json(clientNames);
         }
 
         // Displays a list of all workouts performed by a specific user based upon their UserId in the DB.
