@@ -34,13 +34,19 @@ namespace PT_Management_System_V2.Controllers
             return View(_clientDAO.GetAllClients());
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult TestEndpoint()
         {
             // Use _context (injected via DI) to query Users
-            var clientNames = _context.Users
-                .Select(u => u.Username)
+            //var clientNames = _context.AspNetUsers
+            //    .Select(u => u.UserName)
+            //    .ToList();
+            var clientNames = _context.AspNetUsers
+                .Select(
+                    u => new { u.UserName, u.FirstName, u.LastName }
+                )
                 .ToList();
+
 
             return Json(clientNames);
         }
