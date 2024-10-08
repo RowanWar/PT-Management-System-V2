@@ -7,9 +7,6 @@ public partial class Client
 {
     public int ClientId { get; set; }
 
-    // Foreign key to AspNetUser (Id)
-    //public string UserId { get; set; }
-
     public bool? ContactByPhone { get; set; }
 
     public bool? ContactByEmail { get; set; }
@@ -19,4 +16,9 @@ public partial class Client
     public string? Referral { get; set; }
 
     public virtual ICollection<Coach> Coaches { get; set; } = new List<Coach>();
+
+
+    // Foreign key to AspNetUser (Id)
+    public string UserId { get; set; }
+    //public ApplicationUser ApplicationUser { get; set; }
 }

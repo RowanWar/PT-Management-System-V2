@@ -52,6 +52,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=BeBetter30;Database=ptsystem");
 
+    // Modelbuilder is for the purpose of Entity Framework Core to know the relationship and how to map entities to the database
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // This calls the Microsoft.Identity base models and is essential to ensure authentication works correctly!
@@ -70,7 +71,16 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasMaxLength(150)
                 .HasColumnName("referral");
             entity.Property(e => e.Referred).HasColumnName("referred");
+
+
+            // Define the FK UserId from Client to AspNetUser (Id)
+            entity.HasOne<ApplicationUser>()
+                .WithMany() 
+                .HasForeignKey(c => c.UserId)
+                .IsRequired();
         });
+
+
 
         modelBuilder.Entity<ClientMeasurement>(entity =>
         {
@@ -117,7 +127,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.ToTable("coach");
 
             entity.Property(e => e.CoachId).HasColumnName("coach_id");
-            entity.Property(e => e.CoachClientId).HasColumnName("coach_client_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.CoachProfileDescription)
                 .HasMaxLength(1000)
                 .HasColumnName("coach_profile_description");
@@ -125,9 +135,18 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasMaxLength(500)
                 .HasColumnName("coach_qualifications");
 
-            entity.HasOne(d => d.CoachClient).WithMany(p => p.Coaches)
-                .HasForeignKey(d => d.CoachClientId)
-                .HasConstraintName("coach_coach_client_id_fkey");
+            //entity.HasOne(coach => coach.CoachClient).WithMany(client => client.Coaches)
+            //    .HasForeignKey(coach => coach.UserId)
+            //    .HasConstraintName("coach_coach_user_id_fkey");
+
+
+            // Define the FK UserId from Coach (UserId) to AspNetUsers (Id)
+            entity.HasOne<ApplicationUser>()
+                .WithMany()                
+                .HasForeignKey(coach => coach.UserId)
+                .HasConstraintName("Coach_AspNetUsers_Id_Fkey")
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade); 
         });
 
         modelBuilder.Entity<CoachClient>(entity =>

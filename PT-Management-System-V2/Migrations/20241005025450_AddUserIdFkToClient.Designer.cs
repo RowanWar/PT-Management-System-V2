@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PT_Management_System_V2.Data;
@@ -11,9 +12,11 @@ using PT_Management_System_V2.Data;
 namespace PT_Management_System_V2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241005025450_AddUserIdFkToClient")]
+    partial class AddUserIdFkToClient
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -349,8 +352,9 @@ namespace PT_Management_System_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CoachId"));
 
-                    b.Property<int?>("CoachClientClientId")
-                        .HasColumnType("integer");
+                    b.Property<int?>("CoachClientId")
+                        .HasColumnType("integer")
+                        .HasColumnName("coach_client_id");
 
                     b.Property<string>("CoachProfileDescription")
                         .HasMaxLength(1000)
@@ -362,17 +366,10 @@ namespace PT_Management_System_V2.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("coach_qualifications");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("user_id");
-
                     b.HasKey("CoachId")
                         .HasName("coach_pkey");
 
-                    b.HasIndex("CoachClientClientId");
-
-                    b.HasIndex("UserId");
+                    b.HasIndex("CoachClientId");
 
                     b.ToTable("coach", (string)null);
                 });
@@ -876,14 +873,8 @@ namespace PT_Management_System_V2.Migrations
                 {
                     b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.Client", "CoachClient")
                         .WithMany("Coaches")
-                        .HasForeignKey("CoachClientClientId");
-
-                    b.HasOne("PT_Management_System_V2.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("Coach_AspNetUsers_Id_Fkey");
+                        .HasForeignKey("CoachClientId")
+                        .HasConstraintName("coach_coach_client_id_fkey");
 
                     b.Navigation("CoachClient");
                 });

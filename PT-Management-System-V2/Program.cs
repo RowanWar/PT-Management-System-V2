@@ -116,7 +116,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
         // Get the user
         var user = await userManager.GetUserAsync(context.Principal);
-
+        System.Diagnostics.Debug.WriteLine(user.Id);
         // Generate JWT token
         var token = await jwtTokenService.GenerateToken(user);
 

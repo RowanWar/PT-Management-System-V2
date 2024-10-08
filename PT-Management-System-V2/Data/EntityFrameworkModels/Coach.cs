@@ -7,11 +7,14 @@ public partial class Coach
 {
     public int CoachId { get; set; }
 
-    public int? CoachClientId { get; set; }
+    // Foreign key to AspNetUser (Id)
+    public string UserId { get; set; }
 
     public string? CoachProfileDescription { get; set; }
 
     public string? CoachQualifications { get; set; }
 
     public virtual Client? CoachClient { get; set; }
+
+    //public ApplicationUser ApplicationUser { get; set; }
 }
