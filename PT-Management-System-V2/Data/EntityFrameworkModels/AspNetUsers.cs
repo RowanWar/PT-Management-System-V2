@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace PT_Management_System_V2.Data.EntityFrameworkModels;
 
-public partial class User
+public partial class AspNetUsers
 {
-    public int UserId { get; set; }
+    public string Id { get; set; }
 
     public string Username { get; set; } = null!;
 
@@ -13,7 +13,7 @@ public partial class User
 
     public string Password { get; set; } = null!;
 
-    public DateTime? CreatedAt { get; set; }
+    public DateTime? DateCreated { get; set; }
 
     public string Firstname { get; set; } = null!;
 

@@ -9,10 +9,13 @@ namespace PT_Management_System_V2.Data;
 public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
 
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    private readonly IConfiguration _configuration;
+
+    
+    public ApplicationDbContext(IConfiguration configuration, DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
-
+        _configuration = configuration;
     }
 
 
@@ -48,9 +51,9 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<WorkoutExercise> WorkoutExercises { get; set; }
 
+    
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=BeBetter30;Database=ptsystem");
+        => optionsBuilder.UseNpgsql(_configuration.GetConnectionString("PtSystemDb"));
 
     // Modelbuilder is for the purpose of Entity Framework Core to know the relationship and how to map entities to the database
     protected override void OnModelCreating(ModelBuilder modelBuilder)
