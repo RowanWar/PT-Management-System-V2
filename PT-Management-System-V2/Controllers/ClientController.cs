@@ -27,25 +27,27 @@ public class ClientController : Controller
 
 
     // Create a list out of the client model so the forEach in the index.cshtml can iterate through all the clients properly.
-    //static List<ClientModel> clients = new List<ClientModel>();
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public IActionResult Index()
-    {
-        return View(_clientDAO.GetAllClients());
-    }
+    //static List<ClientModel> clients = new List<ClientModel>(); // P sure this is redundant/obsolete and can be deleted
+
+
+    //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    //public IActionResult Index()
+    //{
+    //    return View(_clientDAO.GetAllClients());
+    //}
 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Policy = "CoachPolicy")]
     [HttpGet()]
-    public IActionResult TestEndpoint([FromBody] string client_id)
+    public IActionResult TestEndpoint([FromQuery] string client_id)
     {
 
         //var clientNames = _context.AspNetUsers
         //    .Select(u => u.Id)
         //    .ToList();
-        var clientNames = _context.AspNetUsers
+        var clientNames = _context.Clients
             .Select(
-                u => new { u.FirstName, u.LastName, u.AccountActive, u.Id, }
+                u => new { u.ClientId }
             )
             .ToList();
 
