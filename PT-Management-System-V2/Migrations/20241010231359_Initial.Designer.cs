@@ -12,8 +12,8 @@ using PT_Management_System_V2.Data;
 namespace PT_Management_System_V2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241008033725_UpdateIdentityModels")]
-    partial class UpdateIdentityModels
+    [Migration("20241010231359_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -262,6 +262,9 @@ namespace PT_Management_System_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ClientId"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("text");
+
                     b.Property<bool?>("ContactByEmail")
                         .HasColumnType("boolean")
                         .HasColumnName("contact_by_email");
@@ -281,10 +284,13 @@ namespace PT_Management_System_V2.Migrations
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("UserId");
 
                     b.HasKey("ClientId")
                         .HasName("client_pkey");
+
+                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("UserId");
 
@@ -398,29 +404,29 @@ namespace PT_Management_System_V2.Migrations
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.CoachClient", b =>
                 {
-                    b.Property<DateTime?>("ClientEndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("client_end_date");
+                    b.Property<int?>("CoachId")
+                        .HasColumnType("integer")
+                        .HasColumnName("coach_id");
 
                     b.Property<int?>("ClientId")
                         .HasColumnType("integer")
                         .HasColumnName("client_id");
 
+                    b.Property<DateTime?>("ClientEndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("client_end_date");
+
                     b.Property<DateTime>("ClientStartDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("client_start_date");
-
-                    b.Property<int?>("CoachId")
-                        .HasColumnType("integer")
-                        .HasColumnName("coach_id");
 
                     b.Property<int>("MonthlyCharge")
                         .HasColumnType("integer")
                         .HasColumnName("monthly_charge");
 
-                    b.HasIndex("ClientId");
+                    b.HasKey("CoachId", "ClientId");
 
-                    b.HasIndex("CoachId");
+                    b.HasIndex("ClientId");
 
                     b.ToTable("coach_client", (string)null);
                 });
@@ -853,7 +859,7 @@ namespace PT_Management_System_V2.Migrations
                         .IsUnique()
                         .HasDatabaseName("RoleNameIndex1");
 
-                    b.ToTable("AspNetRoles", "identity");
+                    b.ToTable("AspNetRoles", "public");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.Models.AspNetRoleClaim", b =>
@@ -879,7 +885,7 @@ namespace PT_Management_System_V2.Migrations
                     b.HasIndex(new[] { "RoleId" }, "IX_AspNetRoleClaims_RoleId")
                         .HasDatabaseName("IX_AspNetRoleClaims_RoleId1");
 
-                    b.ToTable("AspNetRoleClaims", "identity");
+                    b.ToTable("AspNetRoleClaims", "public");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.Models.AspNetUser", b =>
@@ -891,13 +897,17 @@ namespace PT_Management_System_V2.Migrations
                         .HasColumnType("integer");
 
                     b.Property<bool?>("AccountActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("ConcurrencyStamp")
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("DateCreated")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -907,10 +917,12 @@ namespace PT_Management_System_V2.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -954,7 +966,7 @@ namespace PT_Management_System_V2.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex1");
 
-                    b.ToTable("AspNetUsers", "identity");
+                    b.ToTable("AspNetUsers", "public");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.Models.AspNetUserClaim", b =>
@@ -980,7 +992,7 @@ namespace PT_Management_System_V2.Migrations
                     b.HasIndex(new[] { "UserId" }, "IX_AspNetUserClaims_UserId")
                         .HasDatabaseName("IX_AspNetUserClaims_UserId1");
 
-                    b.ToTable("AspNetUserClaims", "identity");
+                    b.ToTable("AspNetUserClaims", "public");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.Models.AspNetUserToken", b =>
@@ -999,7 +1011,7 @@ namespace PT_Management_System_V2.Migrations
 
                     b.HasKey("UserId", "LoginProvider", "Name");
 
-                    b.ToTable("AspNetUserTokens", "identity");
+                    b.ToTable("AspNetUserTokens", "public");
                 });
 
             modelBuilder.Entity("AspNetUserRole", b =>
@@ -1070,11 +1082,17 @@ namespace PT_Management_System_V2.Migrations
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Client", b =>
                 {
+                    b.HasOne("PT_Management_System_V2.Data.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("PT_Management_System_V2.Data.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Coach", b =>
@@ -1083,12 +1101,14 @@ namespace PT_Management_System_V2.Migrations
                         .WithMany("Coaches")
                         .HasForeignKey("CoachClientClientId");
 
-                    b.HasOne("PT_Management_System_V2.Data.ApplicationUser", null)
+                    b.HasOne("PT_Management_System_V2.Data.ApplicationUser", "ApplicationUser")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("Coach_AspNetUsers_Id_Fkey");
+
+                    b.Navigation("ApplicationUser");
 
                     b.Navigation("CoachClient");
                 });
@@ -1096,13 +1116,17 @@ namespace PT_Management_System_V2.Migrations
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.CoachClient", b =>
                 {
                     b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.Client", "Client")
-                        .WithMany()
+                        .WithMany("CoachClients")
                         .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("coach_client_client_id_fkey");
 
                     b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.Coach", "Coach")
-                        .WithMany()
+                        .WithMany("CoachClients")
                         .HasForeignKey("CoachId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("coach_client_coach_id_fkey");
 
                     b.Navigation("Client");
@@ -1233,7 +1257,14 @@ namespace PT_Management_System_V2.Migrations
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Client", b =>
                 {
+                    b.Navigation("CoachClients");
+
                     b.Navigation("Coaches");
+                });
+
+            modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Coach", b =>
+                {
+                    b.Navigation("CoachClients");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Exercise", b =>

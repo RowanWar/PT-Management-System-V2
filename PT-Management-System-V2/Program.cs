@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PT_Management_System_V2.Data;
 using PT_Management_System_V2.Infrastructure.Authentication;
 using PT_Management_System_V2.Services;
+using PT_Management_System_V2.Services.AuthorizationPolicies;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
 builder.Services.AddSingleton<ClientDAO>(provider => new ClientDAO(connectionString));
+
+
 // Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();
 
@@ -32,7 +36,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddDefaultTokenProviders();
 
 
-// Authentication is handled by JWT exclusively
+
 builder.Services.AddAuthentication(options =>
 {
     // Default authentication scheme is set to cookies only for user account logins
@@ -79,7 +83,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Added last night
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CoachPolicy", policy =>
+        policy.Requirements.Add(new CoachAuthorizationPolicy()));
+});
 
+// Imports the authorization policy responsible for protecting controller endpoints to only authorised coaches from viewing client data
+builder.Services.AddScoped<IAuthorizationHandler, CoachAuthorizationHandler>();
+
+builder.Services.AddHttpContextAccessor(); // Needed to access route data
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
@@ -114,7 +128,7 @@ builder.Services.ConfigureApplicationCookie(options =>
         var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
         var jwtTokenService = context.HttpContext.RequestServices.GetRequiredService<JwtTokenService>();
 
-        // Get the user
+        // Get the user context of the signed in user
         var user = await userManager.GetUserAsync(context.Principal);
         System.Diagnostics.Debug.WriteLine(user.Id);
         // Generate JWT token

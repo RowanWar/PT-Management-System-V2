@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <Folder Include="Data\EntityFrameworkModels\" />
-    <Folder Include="Migrations\" />
     <Folder Include="UploadedImages\" />
   </ItemGroup>
 

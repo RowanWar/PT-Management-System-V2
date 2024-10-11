@@ -14,7 +14,11 @@ public partial class Coach
 
     public string? CoachQualifications { get; set; }
 
-    public virtual Client? CoachClient { get; set; }
+    //public virtual Client? CoachClient { get; set; }
 
-    //public ApplicationUser ApplicationUser { get; set; }
+    public ApplicationUser User { get; set; }
+
+    // Navigation property to CoachClient
+    public ICollection<CoachClient> CoachClients { get; set; }
+
 }
