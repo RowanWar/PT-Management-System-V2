@@ -31,10 +31,10 @@ public class ClientController : Controller
 
 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    //public IActionResult Index()
-    //{
-    //    return View(_clientDAO.GetAllClients());
-    //}
+    public IActionResult Index()
+    {
+        return View(_clientDAO.GetAllClients());
+    }
 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Policy = "CoachPolicy")]
