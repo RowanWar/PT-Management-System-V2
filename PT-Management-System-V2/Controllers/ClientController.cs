@@ -5,7 +5,10 @@ using PT_Management_System_V2.Services;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using PT_Management_System_V2.Data; // Might be redundant
+using PT_Management_System_V2.Data;
+using System.Security.Claims; 
+
+
 namespace PT_Management_System_V2.Controllers;
 
 public class ClientController : Controller
@@ -17,7 +20,7 @@ public class ClientController : Controller
     private readonly ClientDAO _clientDAO;
 
     // Uses Dependency Injection to implement both WorkoutDAO and ClientDAO. Currently a lot of functionality for this controller is implemented through WorkoutDAO.
-    public ClientController(ApplicationDbContext context, WorkoutDAO workoutDAO, ClientDAO clientDAO)
+    public ClientController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, WorkoutDAO workoutDAO, ClientDAO clientDAO)
     {
         _context = context;
         _workoutDAO = workoutDAO;
@@ -31,9 +34,25 @@ public class ClientController : Controller
 
 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public IActionResult Index()
+    //[Authorize(Policy = "CoachPolicy")]
+    public async Task<IActionResult> Index()
     {
-        return View(_clientDAO.GetAllClients());
+        // Grab the logged in users ID from the user authorization session context
+        var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // Returns the associated coach_id of a provided user_id, if exists
+        var coachId = await _clientDAO.VerifyAndGetUsersCoachId(contextUserId);
+
+        // This error handling needs to be cleaned up to handle if user has no clients vs is not a coach
+        if (coachId == null)
+        {
+            return BadRequest("You are not registered as a coach or lack clients");
+        }
+
+        // Grabs the CoachId from the returned coach object
+        var retrievedClients = await _clientDAO.GetAllClients(coachId.CoachId);
+
+        return View("Index", retrievedClients);
     }
 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

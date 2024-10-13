@@ -30,7 +30,7 @@ public class CoachAuthorizationHandler : AuthorizationHandler<CoachAuthorization
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, CoachAuthorizationPolicy requirement)
     {
-        // Grab the logged in users ID from AspNetUser (id)
+        // Grab the logged in users ID from the user authorization session context
         var contextUserId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
         
         if (contextUserId == null)
@@ -51,7 +51,7 @@ public class CoachAuthorizationHandler : AuthorizationHandler<CoachAuthorization
         }
 
         // Query the coach table for the coach_id where the user_id matches the logged-in user
-        var coach = await _clientDAO.VerifyUsersCoachId(contextUserId);
+        var coach = await _clientDAO.VerifyAndGetUsersCoachId(contextUserId);
 
         if (coach == null)
         {
@@ -73,11 +73,5 @@ public class CoachAuthorizationHandler : AuthorizationHandler<CoachAuthorization
             context.Fail();
         }
 
-        //var verifyIsClientsCoach = await _context.Coaches
-        //    .Select(coach => coach.UserId).Where()
-        //    //.Where(coach.User)
-        //    .AnyAsync();
-        // get coach id based on user id
-        // if empty, then doesn't exist
     }
 }

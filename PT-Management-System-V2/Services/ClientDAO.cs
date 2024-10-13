@@ -2,6 +2,7 @@
 using Npgsql;
 using PT_Management_System_V2.Data;
 using PT_Management_System_V2.Data.EntityFrameworkModels;
+using PT_Management_System_V2.Data.ViewModels;
 using PT_Management_System_V2.Models;
 
 namespace PT_Management_System_V2.Services;
@@ -22,24 +23,28 @@ public class ClientDAO : IClientDataService
 
 
     // Returns the result as to whether the currently logged in user has a (coach_id) from the coach table, if so, returns this id
-    public async Task<Coach?> VerifyUsersCoachId(string contextUserId)
+    public async Task<Coach?> VerifyAndGetUsersCoachId(string contextUserId)
     {
         // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
-        using var _context = _contextFactory.CreateDbContext(); // Does this need to be wrapped in { } so it automatically closes itself?
+        using var _context = _contextFactory.CreateDbContext(); 
 
         var coach = await _context.Coaches
             .FirstOrDefaultAsync(coach => coach.UserId == contextUserId);
 
+
         return coach;
     }
 
+    //public async Task<>
+
     public async Task<bool> VerifyUserIsClientsCoach(string clientId, int coachId)
     {
-        //int coachIdInt = int.TryParse(coachId, out intOut);
         using var _context = _contextFactory.CreateDbContext();
+
         // Join with the coach_client table and check if the (coach_id) matches the (client_id) being queried
         var isMatch = await _context.CoachClients
             .AnyAsync(coacli => coacli.CoachId == coachId && coacli.ClientId == int.Parse(clientId));
+
 
         return isMatch;
     }
@@ -49,63 +54,39 @@ public class ClientDAO : IClientDataService
         throw new NotImplementedException();
     }
 
-    public List<ClientModel> GetAllClients()
+    public async Task<List<ClientCoach_ClientViewModel?>> GetAllClients(int contextCoachId)
     {
-        List<ClientModel> foundClients = new List<ClientModel>();
+        using var _context = _contextFactory.CreateDbContext();
 
-        string sqlStatement = "SELECT * FROM users";
+        var clients = await
+        (from cc in _context.CoachClients
+         join c in _context.Clients on cc.ClientId equals c.ClientId
+         join u in _context.AspNetUsers on c.UserId equals u.Id 
+         where cc.CoachId == contextCoachId
+         select new ClientCoach_ClientViewModel
+         {
+             // Client details
+             ClientId = c.ClientId,
+             ContactByPhone = c.ContactByPhone,
+             ContactByEmail = c.ContactByEmail, 
+             Referred = c.Referred,
+             Referral = c.Referral,
+
+             // CoachClient details
+             MonthlyCharge = cc.MonthlyCharge,
+             ClientStartDate = cc.ClientStartDate,
+             ClientEndDate = cc.ClientEndDate,
+
+             // AspNetUsers details
+             FirstName = u.FirstName,
+             LastName = u.LastName,
+             UserName = u.UserName,
+             Email = u.Email,
+             PhoneNumber = u.PhoneNumber
+         }).ToListAsync();
 
 
-        using (var connection = new NpgsqlConnection(_dbConnectionString))
-        {
-            try
-            {
-                // Open the connection
-                connection.Open();
-
-
-                // Create a command object
-                using (var cmd = new NpgsqlCommand(sqlStatement, connection))
-                {
-                    var result = cmd.ExecuteReader();
-                    //int val;
-
-                    System.Diagnostics.Debug.WriteLine($"Query result: {result}");
-
-                    if (result.HasRows)
-                    {
-                        while (result.Read())
-                        {
-                            //val = (int)result.GetValue(0);
-                            foundClients.Add(new ClientModel { 
-                                ClientUserId = (int)result["user_id"],
-                                ClientUsername = (string)result["username"],
-                                ClientFirstName = (string)result["firstname"], 
-                                ClientLastName= (string)result["lastname"],
-                                ClientEmail = (string)result["email"],
-                                ClientPhone = (string)result["mobile_number"]
-                     
-                            });
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("No rows found.");
-
-                    }
-
-                    result.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle any errors that might have occurred
-                System.Diagnostics.Debug.WriteLine($"An error occurred: {ex.Message}");
-
-            }
-
-            return foundClients;
-        }
+        return clients;
     }
 
     public ClientModel GetClientById(int id)
