@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PT_Management_System_V2.Data;
 using PT_Management_System_V2.Infrastructure.Authentication;
 using PT_Management_System_V2.Services;
+using PT_Management_System_V2.Services.AuthorizationPolicies;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,13 +16,32 @@ var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var connectionString = builder.Configuration["ConnectionStrings:PtSystemDb"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-
+//void ConfigureDbContextOptions(DbContextOptionsBuilder options)
+//{
+//    options.UseNpgsql(connectionString); // Use your actual database provider here
+//}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseNpgsql(connectionString),
+    optionsLifetime: ServiceLifetime.Singleton);
+//ConfigureDbContextOptions(options));
+
+builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString), 
+    ServiceLifetime.Singleton);
+//ConfigureDbContextOptions(options));
 
 builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
-builder.Services.AddSingleton<ClientDAO>(provider => new ClientDAO(connectionString));
+// Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
+builder.Services.AddSingleton<ClientDAO>(provider =>
+    {
+        var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+            return new ClientDAO(connectionString, contextFactory); 
+    });
+
+//builder.Services.AddScoped<ClientDAO>(provider => new ClientDAO(connectionString)); // Supplying context with null as a TEMPORARY SOLUTION whilst I refactor raw SQL into Linq queries.
+
+
 // Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();
 
@@ -32,7 +53,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddDefaultTokenProviders();
 
 
-// Authentication is handled by JWT exclusively
+
 builder.Services.AddAuthentication(options =>
 {
     // Default authentication scheme is set to cookies only for user account logins
@@ -79,7 +100,17 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+// Added last night
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CoachPolicy", policy =>
+        policy.Requirements.Add(new CoachAuthorizationPolicy()));
+});
 
+// Imports the authorization policy responsible for protecting controller endpoints to only authorised coaches from viewing client data
+builder.Services.AddScoped<IAuthorizationHandler, CoachAuthorizationHandler>();
+
+builder.Services.AddHttpContextAccessor(); // Needed to access route data
 
 builder.Services.AddRazorPages();
 builder.Services.AddControllersWithViews();
@@ -114,7 +145,7 @@ builder.Services.ConfigureApplicationCookie(options =>
         var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
         var jwtTokenService = context.HttpContext.RequestServices.GetRequiredService<JwtTokenService>();
 
-        // Get the user
+        // Get the user context of the signed in user
         var user = await userManager.GetUserAsync(context.Principal);
         System.Diagnostics.Debug.WriteLine(user.Id);
         // Generate JWT token

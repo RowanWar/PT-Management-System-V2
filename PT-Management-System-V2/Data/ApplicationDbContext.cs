@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PT_Management_System_V2.Data.EntityFrameworkModels;
+using PT_Management_System_V2.Data.Models;
 
 namespace PT_Management_System_V2.Data;
 
@@ -14,6 +15,19 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
 
     }
+
+
+    // Identity DbSets
+    public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
+
+    public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
+
+    public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
+
+    public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
+
+    public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
+
 
 
     public virtual DbSet<Client> Clients { get; set; }
@@ -48,9 +62,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<WorkoutExercise> WorkoutExercises { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=BeBetter30;Database=ptsystem");
+
 
     // Modelbuilder is for the purpose of Entity Framework Core to know the relationship and how to map entities to the database
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,26 +70,125 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // This calls the Microsoft.Identity base models and is essential to ensure authentication works correctly!
         base.OnModelCreating(modelBuilder);
 
+
+        // Identity modelbuilders
+        modelBuilder.Entity<AspNetRole>(entity =>
+        {
+            entity.ToTable("AspNetRoles", "public");
+
+            entity.HasIndex(e => e.NormalizedName, "RoleNameIndex").IsUnique();
+
+            entity.Property(e => e.Name).HasMaxLength(256);
+            entity.Property(e => e.NormalizedName).HasMaxLength(256);
+        });
+
+
+        modelBuilder.Entity<AspNetRoleClaim>(entity =>
+        {
+            entity.ToTable("AspNetRoleClaims", "public");
+
+            entity.HasIndex(e => e.RoleId, "IX_AspNetRoleClaims_RoleId");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.AspNetRoleClaims).HasForeignKey(d => d.RoleId);
+        });
+
+
+        modelBuilder.Entity<AspNetUser>(entity =>
+        {
+            entity.ToTable("AspNetUsers", "public");
+
+            entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
+            entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex").IsUnique();
+
+            entity.Property(e => e.FirstName).HasMaxLength(50);
+            entity.Property(e => e.LastName).HasMaxLength(50);
+            entity.Property(e => e.AccountActive).HasDefaultValue(true);
+            entity.Property(e => e.DateCreated)
+                .HasColumnType("timestamp with time zone")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+
+            entity.Property(e => e.Email).HasMaxLength(256);
+            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
+            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
+            entity.Property(e => e.UserName).HasMaxLength(256);
+
+            entity.HasMany(d => d.Roles).WithMany(p => p.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "AspNetUserRole",
+                    r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
+                    l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
+                    j =>
+                    {
+                        j.HasKey("UserId", "RoleId");
+                        j.ToTable("AspNetUserRoles", "identity");
+                        j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
+                    });
+        });
+
+
+        modelBuilder.Entity<AspNetUserClaim>(entity =>
+        {
+            entity.ToTable("AspNetUserClaims", "public");
+
+            entity.HasIndex(e => e.UserId, "IX_AspNetUserClaims_UserId");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserClaims).HasForeignKey(d => d.UserId);
+        });
+
+
+        modelBuilder.Entity<AspNetUserToken>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+
+            entity.ToTable("AspNetUserTokens", "public");
+
+            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
+        });
+
+
+
+        // End of Identity
+
+
+
+
+
         modelBuilder.Entity<Client>(entity =>
         {
-            entity.HasKey(e => e.ClientId).HasName("client_pkey");
-
             entity.ToTable("client");
 
-            entity.Property(e => e.ClientId).HasColumnName("client_id");
-            entity.Property(e => e.ContactByEmail).HasColumnName("contact_by_email");
-            entity.Property(e => e.ContactByPhone).HasColumnName("contact_by_phone");
-            entity.Property(e => e.Referral)
-                .HasMaxLength(150)
-                .HasColumnName("referral");
-            entity.Property(e => e.Referred).HasColumnName("referred");
+            entity.HasKey(e => e.ClientId)
+                  .HasName("client_pkey");
 
+            entity.Property(e => e.ClientId)
+                  .HasColumnName("client_id");
 
-            // Define the FK UserId from Client to AspNetUser (Id)
-            entity.HasOne<ApplicationUser>()
-                .WithMany() 
-                .HasForeignKey(c => c.UserId)
-                .IsRequired();
+            entity.Property(e => e.UserId)
+                  .IsRequired()
+                  .HasColumnName("UserId");
+
+            entity.Property(e => e.ApplicationUserId)
+                  .HasColumnName("ApplicationUserId");
+
+            // Foreign Key relationship with AspNetUsers (UserId)
+            entity.HasOne(d => d.User)
+                  .WithMany() // No navigation property on AspNetUsers
+                  .HasForeignKey(d => d.UserId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_client_AspNetUsers_UserId");
+
+            // Foreign Key relationship with AspNetUsers (ApplicationUserId)
+            entity.HasOne(d => d.User)
+                  .WithMany() // No navigation property on AspNetUsers
+                  .HasForeignKey(d => d.ApplicationUserId)
+                  .HasConstraintName("FK_client_AspNetUsers_ApplicationUserId");
+
+            entity.HasIndex(e => e.UserId)
+                  .HasDatabaseName("IX_client_UserId");
+
+            entity.HasIndex(e => e.ApplicationUserId)
+                  .HasDatabaseName("IX_client_ApplicationUserId");
         });
 
 
@@ -122,52 +233,65 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
         modelBuilder.Entity<Coach>(entity =>
         {
-            entity.HasKey(e => e.CoachId).HasName("coach_pkey");
-
             entity.ToTable("coach");
 
-            entity.Property(e => e.CoachId).HasColumnName("coach_id");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.CoachProfileDescription)
-                .HasMaxLength(1000)
-                .HasColumnName("coach_profile_description");
-            entity.Property(e => e.CoachQualifications)
-                .HasMaxLength(500)
-                .HasColumnName("coach_qualifications");
+            entity.HasKey(e => e.CoachId)
+                  .HasName("coach_pkey");  // Set primary key
 
-            //entity.HasOne(coach => coach.CoachClient).WithMany(client => client.Coaches)
-            //    .HasForeignKey(coach => coach.UserId)
-            //    .HasConstraintName("coach_coach_user_id_fkey");
+            entity.Property(e => e.CoachId)
+                  .HasColumnName("coach_id");
 
+            entity.Property(e => e.UserId)
+                  .IsRequired()
+                  .HasColumnName("user_id");
 
-            // Define the FK UserId from Coach (UserId) to AspNetUsers (Id)
-            entity.HasOne<ApplicationUser>()
-                .WithMany()                
-                .HasForeignKey(coach => coach.UserId)
-                .HasConstraintName("Coach_AspNetUsers_Id_Fkey")
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Cascade); 
+            // Foreign Key relationship with AspNetUsers
+            entity.HasOne(d => d.User)
+                  .WithMany() 
+                  .HasForeignKey(d => d.UserId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("FK_Coach_AspNetUsers_Id");
         });
+
 
         modelBuilder.Entity<CoachClient>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("coach_client");
+            entity.ToTable("coach_client");
 
-            entity.Property(e => e.ClientEndDate).HasColumnName("client_end_date");
-            entity.Property(e => e.ClientId).HasColumnName("client_id");
-            entity.Property(e => e.ClientStartDate).HasColumnName("client_start_date");
-            entity.Property(e => e.CoachId).HasColumnName("coach_id");
-            entity.Property(e => e.MonthlyCharge).HasColumnName("monthly_charge");
+            // Composite primary key
+            entity.HasKey(e => new { e.CoachId, e.ClientId })
+                  .HasName("PK_coach_client");
 
-            entity.HasOne(d => d.Client).WithMany()
-                .HasForeignKey(d => d.ClientId)
-                .HasConstraintName("coach_client_client_id_fkey");
+            entity.Property(e => e.CoachId)
+                  .HasColumnName("coach_id");
 
-            entity.HasOne(d => d.Coach).WithMany()
-                .HasForeignKey(d => d.CoachId)
-                .HasConstraintName("coach_client_coach_id_fkey");
+            entity.Property(e => e.ClientId)
+                  .HasColumnName("client_id");
+
+            entity.Property(e => e.MonthlyCharge)
+                  .IsRequired()
+                  .HasColumnName("monthly_charge");
+
+            entity.Property(e => e.ClientStartDate)
+                  .IsRequired()
+                  .HasColumnName("client_start_date");
+
+            entity.Property(e => e.ClientEndDate)
+                  .HasColumnName("client_end_date");
+
+            // Foreign Key relationship with Coach
+            entity.HasOne(d => d.Coach)
+                  .WithMany(p => p.CoachClients)  
+                  .HasForeignKey(d => d.CoachId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("coach_client_coach_id_fkey");
+
+            // Foreign Key relationship with Client
+            entity.HasOne(d => d.Client)
+                  .WithMany(p => p.CoachClients)  
+                  .HasForeignKey(d => d.ClientId)
+                  .OnDelete(DeleteBehavior.Cascade)
+                  .HasConstraintName("coach_client_client_id_fkey");
         });
 
         modelBuilder.Entity<Exercise>(entity =>
