@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Identity.Client;
+using PT_Management_System_V2.Data;
 using PT_Management_System_V2.Models;
 using PT_Management_System_V2.Services;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Nodes; // Might be redundant
 
@@ -15,29 +17,40 @@ namespace PT_Management_System_V2.Controllers
     public class WorkoutController : Controller
     {
 
+        private readonly ApplicationDbContext _context;
 
-        // Why does this only work if I add this code in the controller? I don't understand why it wouldn't work just with the code in WorkoutDAO?
         private readonly WorkoutDAO _workoutDAO;
+        private readonly ClientDAO _clientDAO;
+        private readonly ReportDAO _reportDAO;
 
-        public WorkoutController(WorkoutDAO workoutDAO)
+        public WorkoutController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, WorkoutDAO workoutDAO, ClientDAO clientDAO, ReportDAO reportDAO)
         {
+            _context = context;
             _workoutDAO = workoutDAO;
+            _clientDAO = clientDAO;
+            _reportDAO = reportDAO;
         }
 
 
+            //// Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
+            //static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
 
 
-        // Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
-        static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
-
-        // How can I avoid passing null (it expects a parameter).
-        //WorkoutDAO WorkoutDAO = new WorkoutDAO(null);
 
         public IActionResult Index()
         {
+            // Grab the logged in users ID from the user authorization session context
+            var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (contextUserId == null)
+            {
+                return NotFound();
+            }
+            // This GetALlWorkouts func needs to be re-structured to accept a string or properly convert to int. Either or.
+            //int uid = Int32.Parse(contextUserId);
 
             // Currently hard coded to use a user ID here. 
-            return View(_workoutDAO.GetAllWorkoutsByUserId(9));
+            return View(_workoutDAO.GetAllWorkoutsByUserId(contextUserId));
         }
 
         public IActionResult CreateWorkout()

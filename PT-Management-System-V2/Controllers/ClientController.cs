@@ -64,9 +64,6 @@ public class ClientController : Controller
     public IActionResult TestEndpoint([FromQuery] string client_id)
     {
 
-        //var clientNames = _context.AspNetUsers
-        //    .Select(u => u.Id)
-        //    .ToList();
         var clientNames = _context.Clients
             .Select(
                 u => new { u.ClientId }
@@ -78,10 +75,11 @@ public class ClientController : Controller
     }
 
     // Displays a list of all workouts performed by a specific user based upon their UserId in the DB.
-    public IActionResult ClientWorkouts(int ClientUserId)
+    [Authorize(Policy = "CoachPolicy")]
+    [HttpGet()]
+    public IActionResult ClientWorkouts(int ClientId)
     {
-        //List<WorkoutModel> workoutList = _workoutDAO.GetAllWorkoutsByUserId(ClientUserId);
-        List<WorkoutExerciseModel> workoutList = _workoutDAO.GetAllWorkoutsByUserId(ClientUserId);
+        List<WorkoutExerciseModel> workoutList = _workoutDAO.GetAllWorkoutsByUserId(ClientId);
 
         return View("ClientWorkout", workoutList);
     }
@@ -91,17 +89,14 @@ public class ClientController : Controller
     {
         List<WorkoutExercisesModel> workoutDetails = _workoutDAO.GetWorkoutDetailsByWorkoutId(WorkoutId);
 
-        //ViewBag.ModelData = workoutDetails;
-
         return View("~/Views/Workout/WorkoutDetails.cshtml", workoutDetails);
     }
 
     [Authorize(Policy = "CoachPolicy")]
     [HttpGet()]
-    public async Task<IActionResult> WeeklyReport([FromQuery] int client_id)
+    public async Task<IActionResult> WeeklyReport([FromQuery] int ClientId)
     {
-        //List<ClientWeeklyReportModel> weeklyReport = _workoutDAO.GetAllWeeklyReportsByUserId(ClientUserId);
-        List<WeeklyReport?> weeklyReport = await _reportDAO.GetAllWeeklyReportsOfUser(client_id);
+        List<WeeklyReport?> weeklyReport = await _reportDAO.GetAllWeeklyReportsOfUser(ClientId);
 
         return View("ClientReport", weeklyReport);
     }
@@ -113,7 +108,6 @@ public class ClientController : Controller
 
         string result = JsonSerializer.Serialize(weeklyReportImages);
 
-        //System.Diagnostics.Debug.WriteLine(result);
         return Json(result.ToString());
     }
 
@@ -125,8 +119,6 @@ public class ClientController : Controller
     public IActionResult Details(ClientModel client)
     {
 
-        //clients.Add(client);
-        //_clientDAO.Add(client);
         return View("Details", client);
     }
 

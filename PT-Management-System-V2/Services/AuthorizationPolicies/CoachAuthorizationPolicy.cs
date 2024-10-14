@@ -40,7 +40,7 @@ public class CoachAuthorizationHandler : AuthorizationHandler<CoachAuthorization
         }
 
         // Grab the client_id being queried via queryParameter 
-        var clientId = _httpContextAccessor.HttpContext.Request.Query["client_id"].ToString();
+        var clientId = _httpContextAccessor.HttpContext.Request.Query["ClientId"].ToString();
 
 
         // If no queryParameter passed of client_id > fail authorization

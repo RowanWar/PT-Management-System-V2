@@ -87,11 +87,11 @@
                             @Html.DisplayFor(modelItem => item.Referral)
                         </td>
  
-@*                         <td>
-                            @Html.ActionLink("View Check-ins", "WeeklyReport", new { item.ClientUserId }) *
-                            @Html.ActionLink("View Workouts", "ClientWorkouts", new { item.ClientUserId })
-                            @Html.ActionLink("Delete", "Delete", new { item.ClientUserId })
-                        </td>  *@
+                        <td>
+                            @Html.ActionLink("View Check-ins", "WeeklyReport", new { item.ClientId, item.FirstName, item.LastName })
+                            @Html.ActionLink("View Workouts", "ClientWorkouts", new { item.ClientId })
+                            @* @Html.ActionLink("Delete", "Delete", new { item.ClientUserId }) *@
+                        </td> 
                     </tr>
                 }
         </tbody>
