@@ -6,7 +6,8 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using PT_Management_System_V2.Data;
-using System.Security.Claims; 
+using System.Security.Claims;
+using PT_Management_System_V2.Data.EntityFrameworkModels;
 
 
 namespace PT_Management_System_V2.Controllers;
@@ -18,13 +19,15 @@ public class ClientController : Controller
     
     private readonly WorkoutDAO _workoutDAO;
     private readonly ClientDAO _clientDAO;
+    private readonly ReportDAO _reportDAO;
 
     // Uses Dependency Injection to implement both WorkoutDAO and ClientDAO. Currently a lot of functionality for this controller is implemented through WorkoutDAO.
-    public ClientController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, WorkoutDAO workoutDAO, ClientDAO clientDAO)
+    public ClientController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, WorkoutDAO workoutDAO, ClientDAO clientDAO, ReportDAO reportDAO)
     {
         _context = context;
         _workoutDAO = workoutDAO;
         _clientDAO = clientDAO;
+        _reportDAO = reportDAO;
     }
 
 
@@ -93,14 +96,15 @@ public class ClientController : Controller
         return View("~/Views/Workout/WorkoutDetails.cshtml", workoutDetails);
     }
 
+    [Authorize(Policy = "CoachPolicy")]
+    [HttpGet()]
+    public async Task<IActionResult> WeeklyReport([FromQuery] int client_id)
+    {
+        //List<ClientWeeklyReportModel> weeklyReport = _workoutDAO.GetAllWeeklyReportsByUserId(ClientUserId);
+        List<WeeklyReport?> weeklyReport = await _reportDAO.GetAllWeeklyReportsOfUser(client_id);
 
-    //public IActionResult WeeklyReport(int ClientUserId)
-    //{
-    //    List<ClientWeeklyReportModel> weeklyReport = _workoutDAO.GetAllWeeklyReportsByUserId(ClientUserId);
-    //    List<NewModel> weeklyReport = _reportDAO.GetWeeklyReportByUserId(userId);
-
-    //    return View("ClientReport", weeklyReport);
-    //}
+        return View("ClientReport", weeklyReport);
+    }
 
     
     public IActionResult ViewImage(int ReportId)

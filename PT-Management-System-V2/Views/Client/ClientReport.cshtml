@@ -1,4 +1,4 @@
-﻿@model IEnumerable<PT_Management_System_V2.Models.ClientWeeklyReportModel>
+﻿@model IEnumerable<PT_Management_System_V2.Data.EntityFrameworkModels.WeeklyReport>
 
 @* <style>
     body {
@@ -73,7 +73,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.ReportNotes)
+                @Html.DisplayNameFor(model => model.Notes)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.CheckInDate)
@@ -94,7 +94,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ReportNotes)
+                @Html.DisplayFor(modelItem => item.Notes)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.CheckInDate)
