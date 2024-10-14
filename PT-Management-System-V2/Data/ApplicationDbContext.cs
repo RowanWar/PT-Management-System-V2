@@ -453,10 +453,11 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.Notes)
                 .HasMaxLength(1000)
                 .HasColumnName("notes");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ClientId).HasColumnName("client_id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.WeeklyReports)
-                .HasForeignKey(d => d.UserId)
+            entity.HasOne(d => d.Client)
+                .WithMany(p => p.WeeklyReports)
+                .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("weekly_report_user_id_fkey");
         });
 

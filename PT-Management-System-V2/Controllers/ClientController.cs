@@ -94,12 +94,13 @@ public class ClientController : Controller
     }
 
 
-    public IActionResult WeeklyReport(int ClientUserId)
-    {
-        List<ClientWeeklyReportModel> weeklyReport = _workoutDAO.GetAllWeeklyReportsByUserId(ClientUserId);
+    //public IActionResult WeeklyReport(int ClientUserId)
+    //{
+    //    List<ClientWeeklyReportModel> weeklyReport = _workoutDAO.GetAllWeeklyReportsByUserId(ClientUserId);
+    //    List<NewModel> weeklyReport = _reportDAO.GetWeeklyReportByUserId(userId);
 
-        return View("ClientReport", weeklyReport);
-    }
+    //    return View("ClientReport", weeklyReport);
+    //}
 
     
     public IActionResult ViewImage(int ReportId)

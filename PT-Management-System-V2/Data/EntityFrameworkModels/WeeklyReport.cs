@@ -7,7 +7,7 @@ public partial class WeeklyReport
 {
     public int WeeklyReportId { get; set; }
 
-    public int? UserId { get; set; }
+    public int? ClientId { get; set; }
 
     public string? Notes { get; set; }
 
@@ -19,7 +19,7 @@ public partial class WeeklyReport
 
     public DateTime? DateDeleted { get; set; }
 
-    public virtual User? User { get; set; }
+    public virtual Client? Client{ get; set; }
 
     public virtual ICollection<WeeklyReportImage> WeeklyReportImages { get; set; } = new List<WeeklyReportImage>();
 }
