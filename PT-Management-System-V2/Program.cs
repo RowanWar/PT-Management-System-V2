@@ -31,7 +31,13 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     ServiceLifetime.Singleton);
 
 
-builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
+//builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
+// Registers WorkoutDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
+builder.Services.AddSingleton<WorkoutDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new WorkoutDAO(connectionString, contextFactory);
+});
 
 // Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
 builder.Services.AddSingleton<ClientDAO>(provider =>

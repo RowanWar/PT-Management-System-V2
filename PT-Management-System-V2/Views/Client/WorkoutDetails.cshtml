@@ -1,0 +1,57 @@
+﻿@model IEnumerable<PT_Management_System_V2.Data.ViewModels.WorkoutExercise_Workout_Set_Exercise_ViewModel>
+
+
+<h4>Details of a client </h4>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SetCategory)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reps)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                @*             <td>
+            @Html.DisplayFor(modelItem => item.WorkoutName)
+            </td> *@
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExerciseName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Weight)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SetCategory)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reps)
+                </td>
+                <td>
+                    @Html.ActionLink("Workout Details", "WorkoutDetails", new { item.WorkoutId })
+                    @* <a asp-action="Details" asp-route-id="@item.WorkoutId">View Workout</a> | *@
+                    @* <a asp-action="Delete" asp-route-id="@item.WorkoutId">Delete</a> *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

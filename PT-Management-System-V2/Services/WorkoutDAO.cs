@@ -8,6 +8,11 @@ using System.Xml.Linq;
 using System.Numerics;
 using System.Text.Json;
 using System.Configuration;
+using Microsoft.EntityFrameworkCore.Internal;
+using PT_Management_System_V2.Data.EntityFrameworkModels;
+using Microsoft.EntityFrameworkCore;
+using PT_Management_System_V2.Data;
+using PT_Management_System_V2.Data.ViewModels;
 
 namespace PT_Management_System_V2.Services;
 
@@ -15,15 +20,87 @@ namespace PT_Management_System_V2.Services;
 public class WorkoutDAO /*: IWorkoutDataService*/ 
 {
     private readonly string _dbConnectionString;
-
-    public WorkoutDAO(string dbConnectionString)
+    // Uses a DbContextFactory to create new instances of dbcontext for scoped/transient background services (such as this), which is best-practise rather than relying on IServiceProvider which is an anti-pattern.
+    private readonly IDbContextFactory<ApplicationDbContext> _contextFactory;
+    public WorkoutDAO(string dbConnectionString, IDbContextFactory<ApplicationDbContext> contextFactory)
     {
         _dbConnectionString = dbConnectionString;
+        _contextFactory = contextFactory;
+    }
 
+    // [FOR COACH] 
+    public async Task<List<Workout?>> GetAllWorkoutsByClientId(int clientId)
+    {
+        using var _context = _contextFactory.CreateDbContext();
+
+
+        //return workouts;
+        var workouts = await
+        (from w in _context.Workouts
+         join c in _context.Clients on w.WorkoutUserId equals c.UserId
+         where c.ClientId == clientId
+         select new Workout
+         {
+             // Client details
+             WorkoutUserId = w.WorkoutUserId,
+             WorkoutId = w.WorkoutId,
+             WorkoutActive = w.WorkoutActive
+         }).ToListAsync();
+
+
+        return workouts;
     }
 
 
-    public List<WorkoutExerciseModel> GetAllWorkoutsByUserId(int UserId)
+
+    
+    public async Task<List<WorkoutExercise_Workout_Set_Exercise_ViewModel?>> GetWorkoutsByClientIdAndWorkoutId(int clientId, int workoutId)
+    {
+        using var _context = _contextFactory.CreateDbContext();
+
+        ////return workouts;
+        //var result = await
+        //(from w in _context.Workouts
+        // join c in _context.Clients on w.WorkoutUserId equals c.UserId
+        // //join s in _context.Set on 
+        // where c.ClientId == clientId
+        // select new WorkoutExercise_Workout_Set_Exercise_ViewModel
+        // {
+        //     // Client details
+        //     w = workout,
+
+        //     WorkoutId = w.WorkoutId,
+        //     WorkoutActive = w.WorkoutActive
+        // }).ToListAsync();
+
+
+        var workoutDetails = await (
+            from e in _context.Exercises
+            join we in _context.WorkoutExercises on e.ExerciseId equals we.ExerciseId
+            join s in _context.Sets on we.WorkoutExerciseId equals s.WorkoutExerciseId
+            join sc in _context.SetCategories on s.SetCategoryId equals sc.SetCategoryId
+            where we.WorkoutId == workoutId
+            orderby e.ExerciseName
+            select new WorkoutExercise_Workout_Set_Exercise_ViewModel
+            {
+                ExerciseName = e.ExerciseName,
+                MuscleGroup = e.MuscleGroup,
+                Description = e.Description,
+                SetId = s.SetId,
+                Reps = s.Reps,
+                Weight = s.Weight,
+                StartTime = s.Starttime,
+                EndTime = s.Endtime,
+                SetCategoryType = sc.SetCategoryType,
+                WorkoutExerciseId = we.WorkoutExerciseId
+            }).ToListAsync();
+
+
+        return workoutDetails;
+    }
+
+
+    public List<WorkoutExerciseModel> GetAllWorkoutsByUserId(string UserId)
     {
         {
             List<WorkoutExerciseModel> foundWorkouts = new List<WorkoutExerciseModel>();

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PT_Management_System_V2.Models;
+//using PT_Management_System_V2.Models;
 using Microsoft.AspNetCore.Mvc.Razor.Compilation;
 using PT_Management_System_V2.Services;
 using System.Text.Json;
@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using PT_Management_System_V2.Data;
 using System.Security.Claims;
 using PT_Management_System_V2.Data.EntityFrameworkModels;
+using PT_Management_System_V2.Data.ViewModels;
 
 
 namespace PT_Management_System_V2.Controllers;
@@ -32,9 +33,6 @@ public class ClientController : Controller
 
 
 
-    // Create a list out of the client model so the forEach in the index.cshtml can iterate through all the clients properly.
-    //static List<ClientModel> clients = new List<ClientModel>(); // P sure this is redundant/obsolete and can be deleted
-
 
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     //[Authorize(Policy = "CoachPolicy")]
@@ -58,6 +56,7 @@ public class ClientController : Controller
         return View("Index", retrievedClients);
     }
 
+
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Authorize(Policy = "CoachPolicy")]
     [HttpGet()]
@@ -74,23 +73,17 @@ public class ClientController : Controller
         return Json(clientNames);
     }
 
-    // Displays a list of all workouts performed by a specific user based upon their UserId in the DB.
+    // [For Coach] Displays a list of all workouts performed by a specific user based upon their ClientId 
     [Authorize(Policy = "CoachPolicy")]
     [HttpGet()]
-    public IActionResult ClientWorkouts(int ClientId)
+    public async Task<IActionResult> ClientWorkouts(int clientId)
     {
-        List<WorkoutExerciseModel> workoutList = _workoutDAO.GetAllWorkoutsByUserId(ClientId);
+        List<Workout?> workoutList = await _workoutDAO.GetAllWorkoutsByClientId(clientId);
 
         return View("ClientWorkout", workoutList);
     }
 
-    // Displays the workout details of a user based upon the WorkoutId provided
-    public IActionResult WorkoutDetails(int WorkoutId)
-    {
-        List<WorkoutExercisesModel> workoutDetails = _workoutDAO.GetWorkoutDetailsByWorkoutId(WorkoutId);
 
-        return View("~/Views/Workout/WorkoutDetails.cshtml", workoutDetails);
-    }
 
     [Authorize(Policy = "CoachPolicy")]
     [HttpGet()]
@@ -101,29 +94,47 @@ public class ClientController : Controller
         return View("ClientReport", weeklyReport);
     }
 
-    
-    public IActionResult ViewImage(int ReportId)
+    // [For Coach] Displays details of a specific workout based upon a WorkoutId 
+    [Authorize(Policy = "CoachPolicy")]
+    [HttpGet()]
+    public async Task<IActionResult> WorkoutDetails(int clientId, int workoutId)
     {
-        List<ImageModel> weeklyReportImages = _workoutDAO.GetAllImagesByWeeklyReportId(ReportId);
+        List<WorkoutExercise_Workout_Set_Exercise_ViewModel?> workoutList = await _workoutDAO.GetWorkoutsByClientIdAndWorkoutId(clientId, workoutId);
 
-        string result = JsonSerializer.Serialize(weeklyReportImages);
-
-        return Json(result.ToString());
+        // think need to create a different view
+        return View("WorkoutDetails", workoutList);
     }
 
-    public IActionResult Create()
-    {
-        return View();
-    }
+    //public IActionResult ViewImage(int ReportId)
+    //{
+    //    List<ImageModel> weeklyReportImages = _workoutDAO.GetAllImagesByWeeklyReportId(ReportId);
 
-    public IActionResult Details(ClientModel client)
-    {
+    //    string result = JsonSerializer.Serialize(weeklyReportImages);
 
-        return View("Details", client);
-    }
+    //    return Json(result.ToString());
+    //}
 
-    public IActionResult Overview()
-    {
-        return View();
-    }
+    //public IActionResult Create()
+    //{
+    //    return View();
+    //}
+
+    //public IActionResult Details(ClientModel client)
+    //{
+
+    //    return View("Details", client);
+    //}
+
+    // Displays the workout details of a user based upon the WorkoutId provided
+    //public IActionResult WorkoutDetails(int WorkoutId)
+    //{
+    //    List<WorkoutExercisesModel> workoutDetails = _workoutDAO.GetWorkoutDetailsByWorkoutId(WorkoutId);
+
+    //    return View("~/Views/Workout/WorkoutDetails.cshtml", workoutDetails);
+    //}
+
+    //public IActionResult Overview()
+    //{
+    //    return View();
+    //}
 }

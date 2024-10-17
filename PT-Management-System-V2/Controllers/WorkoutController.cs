@@ -32,11 +32,11 @@ namespace PT_Management_System_V2.Controllers
         }
 
 
-            //// Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
-            //static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
+        //// Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
+        //static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
 
 
-
+        // Commented out for migration
         public IActionResult Index()
         {
             // Grab the logged in users ID from the user authorization session context
@@ -46,10 +46,8 @@ namespace PT_Management_System_V2.Controllers
             {
                 return NotFound();
             }
-            // This GetALlWorkouts func needs to be re-structured to accept a string or properly convert to int. Either or.
-            //int uid = Int32.Parse(contextUserId);
+  
 
-            // Currently hard coded to use a user ID here. 
             return View(_workoutDAO.GetAllWorkoutsByUserId(contextUserId));
         }
 

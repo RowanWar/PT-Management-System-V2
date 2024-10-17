@@ -35,7 +35,27 @@ public class ClientDAO : IClientDataService
         return coach;
     }
 
-    //public async Task<>
+
+
+
+
+    public async Task<int> GetClientIdFromWorkoutId(string workoutId)
+    {
+        // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
+        using var _context = _contextFactory.CreateDbContext();
+
+        var ClientId = await (
+            from w in _context.Workouts
+            join u in _context.AspNetUsers on w.WorkoutUserId equals u.Id
+            join c in _context.Clients on w.WorkoutUserId equals c.UserId
+            where w.WorkoutId == Int64.Parse(workoutId)
+            select c.ClientId)
+            .FirstOrDefaultAsync();
+
+
+        return ClientId;
+    }
+    
 
     public async Task<bool> VerifyUserIsClientsCoach(string clientId, int coachId)
     {
@@ -54,16 +74,16 @@ public class ClientDAO : IClientDataService
         throw new NotImplementedException();
     }
 
-    public async Task<List<ClientCoach_ClientViewModel?>> GetAllClients(int contextCoachId)
+    public async Task<List<ClientCoach_Client_ViewModel?>> GetAllClients(int contextCoachId)
     {
         using var _context = _contextFactory.CreateDbContext();
 
         var clients = await
         (from cc in _context.CoachClients
          join c in _context.Clients on cc.ClientId equals c.ClientId
-         join u in _context.AspNetUsers on c.UserId equals u.Id 
+         join u in _context.AspNetUsers on c.UserId equals u.Id // Was WorkoutUserId
          where cc.CoachId == contextCoachId
-         select new ClientCoach_ClientViewModel
+         select new ClientCoach_Client_ViewModel
          {
              // Client details
              ClientId = c.ClientId,
