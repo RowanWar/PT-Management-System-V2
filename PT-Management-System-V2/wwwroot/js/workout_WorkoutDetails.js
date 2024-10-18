@@ -36,13 +36,16 @@
             if (cellValue.indexOf(filterValue) > -1) {
                 if (!seenValues.has(cellValue)) {
                     seenValues.add(cellValue);
+                    // Display = "" makes this visible
                     row.style.display = "";
+                    row.classList.add("exercise-parent-row");
                     addToggle(row, cellValue);
                 }
                 else {
-                    // Hides any rows after the first "parent row" i.e shows exerciseGroupId set 0 but not set 1, 2, etc.
-                    row.style.display = "none";
+                    // Explicitely defines rows as visible that belong to the parent row i.e. all related rows within the table
+                    row.style.display = "";
                     row.classList.add("child-hidden-row");
+                    //style.margin = 1em 0 4em 0;
                 }
             }
             else if (seenValues.has(cellValue)) {
@@ -53,31 +56,34 @@
         });
     }
 
+    // Creates an event listener onto the first element among the <tds> to fire collapse/expansion of child sets within an exercise 
     function addToggle(row, cellValue) {
-        let toggleBtn = document.createElement('span');
-        toggleBtn.textContent = "Toggle";
-        toggleBtn.className = "toggle-btn";
-        toggleBtn.style.marginLeft = "10px";
-        toggleBtn.style.cursor = "pointer";
-        toggleBtn.style.color = "blue";
-        toggleBtn.style.textDecoration = "underline";
-        toggleBtn.addEventListener('click', function () {
+        //let toggleBtn = document.createElement('span');
+        //toggleBtn.textContent = "Toggle";
+        //toggleBtn.className = "toggle-btn";
+        //toggleBtn.style.marginLeft = "10px";
+        //toggleBtn.style.cursor = "pointer";
+        //toggleBtn.style.color = "blue";
+        //toggleBtn.style.textDecoration = "underline";
+        row.firstElementChild.addEventListener('click', function () {
             rows.forEach(function (r) {
                 let cells = r.getElementsByTagName("td");
                 let value = cells[columnIndex].textContent || cells[columnIndex].innerText;
 
-                // Handles the toggle button hiding rows
+                // Handles the toggle status hiding / displaying the hidden rows
                 if (value === cellValue && r !== row) {
                     if (r.style.display === "none") {
                         r.style.display = "";
+                        row.firstElementChild.style.color = "#1f1f1f";
                     } else {
                         r.style.display = "none";
+                        row.firstElementChild.style.color = "red";
                     }
                 }
             });
         });
 
         let cell = row.getElementsByTagName("td")[columnIndex];
-        cell.appendChild(toggleBtn);
+        //cell.appendChild(toggleBtn);
     }
 });
