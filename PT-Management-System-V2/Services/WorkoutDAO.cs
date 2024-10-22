@@ -669,163 +669,207 @@ public class WorkoutDAO /*: IWorkoutDataService*/
 
 
 
-    public List<WorkoutModel> CheckActiveWorkoutByUserId(int UserId)
+    public async Task<List<int>> CheckActiveWorkoutByUserId(string userId)
     {
-        List<WorkoutModel> foundActiveWorkout = new List<WorkoutModel>();
+        using var _context = _contextFactory.CreateDbContext();
+
+        var activeWorkoutId = await(
+                    from w in _context.Workouts
+                    where w.WorkoutActive == true
+                    select w.WorkoutId
+                    ).ToListAsync();
 
 
-        string sqlStatement = "SELECT * FROM workout WHERE user_id = @UserId AND workout_active = true LIMIT 1";
+        return activeWorkoutId;
 
 
-        using (var connection = new NpgsqlConnection(_dbConnectionString))
-        {
-            try
-            {
-                // Open the connection
-                connection.Open();
+        //List<WorkoutModel> foundActiveWorkout = new List<WorkoutModel>();
 
 
-                // Create a command object
-                using (var cmd = new NpgsqlCommand(sqlStatement, connection))
-                {
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
-                    var result = cmd.ExecuteReader();
-                    System.Diagnostics.Debug.WriteLine($"Query result: {result}");
+        //string sqlStatement = "SELECT * FROM workout WHERE UserId = @userId AND workout_active = true LIMIT 1";
 
-                    if (result.HasRows)
-                    {
-                        while (result.Read())
-                        {
-                            //val = (int)result.GetValue(0);
-                            foundActiveWorkout.Add(new WorkoutModel
-                            {
-                                WorkoutId = (int)result["workout_id"],
-                                Duration = (TimeSpan)result["duration"],
-                                // Checks if notes contains a null value, if so assigns null value to the result instead.
-                                Notes = result["notes"] is DBNull ? (string?)null : (string)result["notes"]
-                            });
 
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("No rows found.");
+        //using (var connection = new NpgsqlConnection(_dbConnectionString))
+        //{
+        //    try
+        //    {
+        //        // Open the connection
+        //        connection.Open();
 
-                    }
 
-                    result.Close();
-                    //return foundClients;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle any errors that might have occurred
-                System.Diagnostics.Debug.WriteLine($"An error occurred: {ex.Message}");
+        //        // Create a command object
+        //        using (var cmd = new NpgsqlCommand(sqlStatement, connection))
+        //        {
+        //            cmd.Parameters.AddWithValue("@UserId", userId);
+        //            var result = cmd.ExecuteReader();
+        //            System.Diagnostics.Debug.WriteLine($"Query result: {result}");
 
-            }
+        //            if (result.HasRows)
+        //            {
+        //                while (result.Read())
+        //                {
+        //                    //val = (int)result.GetValue(0);
+        //                    foundActiveWorkout.Add(new WorkoutModel
+        //                    {
+        //                        WorkoutId = (int)result["workout_id"],
+        //                        Duration = (TimeSpan)result["duration"],
+        //                        // Checks if notes contains a null value, if so assigns null value to the result instead.
+        //                        Notes = result["notes"] is DBNull ? (string?)null : (string)result["notes"]
+        //                    });
 
-            System.Diagnostics.Debug.WriteLine("Returning fetch request now...");
-            return foundActiveWorkout;
-        }
+        //                }
+        //            }
+        //            else
+        //            {
+        //                System.Diagnostics.Debug.WriteLine("No rows found.");
+
+        //            }
+
+        //            result.Close();
+        //            //return foundClients;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle any errors that might have occurred
+        //        System.Diagnostics.Debug.WriteLine($"An error occurred: {ex.Message}");
+
+        //    }
+
+        //    System.Diagnostics.Debug.WriteLine("Returning fetch request now...");
+        //    return foundActiveWorkout;
+        //}
 
     }
 
 
-
-
-    public List<WorkoutExercisesModel> ViewActiveWorkoutByUserId(int UserId)
+    public async Task<List<WorkoutExercise_Workout_Set_Exercise_ViewModel?>> ViewActiveWorkoutByUserId(string userId)
     {
-        List<WorkoutExercisesModel> foundActiveWorkout = new List<WorkoutExercisesModel>();
+        using var _context = _contextFactory.CreateDbContext();
 
-        string sqlStatement = @"SELECT
-                                        w.workout_id,
-                                        w.workout_date,
-                                        w.duration AS workout_duration,
-                                        e.exercise_name,
-                                        e.muscle_group,
-                                        we.notes AS workout_exercise_notes,
-	                                    s.workout_exercise_id,
-                                        s.set_id,
-                                        s.weight,
-	                                    s.reps,
-                                        sc.set_category_type AS set_category,
-                                        s.starttime AS set_start_time,
-                                        s.endtime AS set_end_time
-                                    FROM
-                                        workout w
-                                    JOIN
-                                        workout_exercise we ON we.workout_id = w.workout_id
-                                    JOIN
-                                        exercise e ON e.exercise_id = we.exercise_id
-                                    JOIN
-                                        set s ON s.workout_exercise_id = we.workout_exercise_id
-                                    JOIN
-                                        set_category sc ON sc.set_category_id = s.set_category_id
-                                    WHERE
-                                        w.user_id = @UserId
-                                        AND w.workout_active = true
-                                    ORDER BY
-                                        w.workout_date DESC,
-                                        e.exercise_name,
-                                        s.workout_exercise_id,
-	                                    s.set_id;";
-
-        using (var connection = new NpgsqlConnection(_dbConnectionString))
-        {
-            try
-            {
-                // Open the connection
-                connection.Open();
-
-
-                // Create a command object
-                using (var cmd = new NpgsqlCommand(sqlStatement, connection))
-                {
-                    cmd.Parameters.AddWithValue("@UserId", UserId);
-                    var result = cmd.ExecuteReader();
-                    System.Diagnostics.Debug.WriteLine($"Query result: {result}");
-
-                    if (result.HasRows)
+        var activeWorkout = await (
+                    from w in _context.Workouts
+                    join we in _context.WorkoutExercises on w.WorkoutId equals we.WorkoutId
+                    join e in _context.Exercises on we.ExerciseId equals e.ExerciseId
+                    join s in _context.Sets on we.WorkoutExerciseId equals s.WorkoutExerciseId
+                    join sc in _context.SetCategories on s.SetCategoryId equals sc.SetCategoryId
+                    where w.WorkoutUserId == userId && w.WorkoutActive == true
+                    orderby w.WorkoutDate descending, e.ExerciseName, we.WorkoutExerciseId, s.SetId
+                    select new WorkoutExercise_Workout_Set_Exercise_ViewModel
                     {
-                        while (result.Read())
-                        {
-                            //val = (int)result.GetValue(0);
-                            foundActiveWorkout.Add(new WorkoutExercisesModel
-                            {
-                                ExerciseName = (string)result["exercise_name"],
-                                WorkoutExerciseId = (int)result["workout_exercise_id"],
-                                MuscleGroup = (string)result["muscle_group"],
-                                WorkoutExerciseNotes = (string)result["workout_exercise_notes"],
-                                //SetsCount = (Int64)result["sets_count"],
-                                Reps = (int)result["reps"],
-                                Weight = (Decimal)result["weight"],
-                                SetId = (int)result["set_id"],
-                                SetCategory = (string)result["set_category"]
-                            });
+                        WorkoutId = w.WorkoutId,
+                        WorkoutDate = w.WorkoutDate,
+                        Duration = w.Duration,
+                        ExerciseName = e.ExerciseName,
+                        MuscleGroup = e.MuscleGroup,
+                        Notes = we.Notes,
+                        //WorkoutExerciseId = s.WorkoutExerciseId,
+                        SetId = s.SetId,
+                        Weight = s.Weight,
+                        Reps = s.Reps,
+                        SetCategoryType = sc.SetCategoryType,
+                        StartTime = s.Starttime,
+                        EndTime = s.Endtime
+                    }).ToListAsync();
 
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("No rows found.");
 
-                    }
-
-                    result.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle any errors that might have occurred
-                System.Diagnostics.Debug.WriteLine($"An error occurred: {ex.Message}");
-
-            }
-
-            System.Diagnostics.Debug.WriteLine("Returning fetch request now...");
-            return foundActiveWorkout;
-        }
-
+        return activeWorkout;
     }
+
+
+    //public List<WorkoutExercisesModel> ViewActiveWorkoutByUserId(int UserId)
+    //{
+    //    List<WorkoutExercisesModel> foundActiveWorkout = new List<WorkoutExercisesModel>();
+
+    //    string sqlStatement = @"SELECT
+    //                                    w.workout_id,
+    //                                    w.workout_date,
+    //                                    w.duration AS workout_duration,
+    //                                    e.exercise_name,
+    //                                    e.muscle_group,
+    //                                    we.notes AS workout_exercise_notes,
+    //                                 s.workout_exercise_id,
+    //                                    s.set_id,
+    //                                    s.weight,
+    //                                 s.reps,
+    //                                    sc.set_category_type AS set_category,
+    //                                    s.starttime AS set_start_time,
+    //                                    s.endtime AS set_end_time
+    //                                FROM
+    //                                    workout w
+    //                                JOIN
+    //                                    workout_exercise we ON we.workout_id = w.workout_id
+    //                                JOIN
+    //                                    exercise e ON e.exercise_id = we.exercise_id
+    //                                JOIN
+    //                                    set s ON s.workout_exercise_id = we.workout_exercise_id
+    //                                JOIN
+    //                                    set_category sc ON sc.set_category_id = s.set_category_id
+    //                                WHERE
+    //                                    w.user_id = @UserId
+    //                                    AND w.workout_active = true
+    //                                ORDER BY
+    //                                    w.workout_date DESC,
+    //                                    e.exercise_name,
+    //                                    s.workout_exercise_id,
+    //                                 s.set_id;";
+
+    //    using (var connection = new NpgsqlConnection(_dbConnectionString))
+    //    {
+    //        try
+    //        {
+    //            // Open the connection
+    //            connection.Open();
+
+
+    //            // Create a command object
+    //            using (var cmd = new NpgsqlCommand(sqlStatement, connection))
+    //            {
+    //                cmd.Parameters.AddWithValue("@UserId", UserId);
+    //                var result = cmd.ExecuteReader();
+    //                System.Diagnostics.Debug.WriteLine($"Query result: {result}");
+
+    //                if (result.HasRows)
+    //                {
+    //                    while (result.Read())
+    //                    {
+    //                        //val = (int)result.GetValue(0);
+    //                        foundActiveWorkout.Add(new WorkoutExercisesModel
+    //                        {
+    //                            ExerciseName = (string)result["exercise_name"],
+    //                            WorkoutExerciseId = (int)result["workout_exercise_id"],
+    //                            MuscleGroup = (string)result["muscle_group"],
+    //                            WorkoutExerciseNotes = (string)result["workout_exercise_notes"],
+    //                            //SetsCount = (Int64)result["sets_count"],
+    //                            Reps = (int)result["reps"],
+    //                            Weight = (Decimal)result["weight"],
+    //                            SetId = (int)result["set_id"],
+    //                            SetCategory = (string)result["set_category"]
+    //                        });
+
+    //                    }
+    //                }
+    //                else
+    //                {
+    //                    System.Diagnostics.Debug.WriteLine("No rows found.");
+
+    //                }
+
+    //                result.Close();
+    //            }
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            // Handle any errors that might have occurred
+    //            System.Diagnostics.Debug.WriteLine($"An error occurred: {ex.Message}");
+
+    //        }
+
+    //        System.Diagnostics.Debug.WriteLine("Returning fetch request now...");
+    //        return foundActiveWorkout;
+    //    }
+
+    //}
 
 
 

@@ -43,7 +43,7 @@ namespace PT_Management_System_V2.Data.ViewModels
         // Workout Model
         public int WorkoutId { get; set; }
 
-        public DateTime WorkoutDate { get; set; }
+        public DateOnly WorkoutDate { get; set; }
 
         public TimeSpan Duration { get; set; }
 

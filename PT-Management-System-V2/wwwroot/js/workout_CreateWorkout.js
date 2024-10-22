@@ -90,16 +90,17 @@ let btn = document.querySelector("#addExerciseBtn");
 let span = document.querySelector(".close");
 
 
+// Checks if the currently logged in user has a workout set to active in the database
 function CheckForActiveWorkout() {
-    fetch('/Workout/CheckForActiveWorkout?UserId=' + UserId)
+    fetch('/Workout/CheckForActiveWorkout')
         .then(response => response.json())
         .then(data => {
-            let activeWorkoutObj = JSON.parse(data);
-            WorkoutId = activeWorkoutObj[0].WorkoutId;
+            let workoutId = JSON.parse(data);
+            localStorage.setItem("workoutId", workoutId);
 
-            localStorage.setItem("workoutId", WorkoutId);
-            // If the first API lookup does not return a valid WorkoutId, the second API lookup which pulls the users active workout does not initiate.
-            if (WorkoutId != null) {
+
+            // Executes if the first API call (CheckForActiveWorkout) returns a valid workout
+            if (workoutId != null) {
                 queryActiveWorkoutExercises();
 
             }
@@ -115,7 +116,8 @@ function submitExercises() {
     console.log(WorkoutId);
     //Converts the GLOBAL string array (required to be used by .push and .splice in activeRows()) to an integer so it can be parsed correctly by the backend, which only accepts <int> data type.
     let ExerciseIdsIntArray = selectedExerciseIds.map(item => Number(item));
-/*    let WorkoutId = 201;*/
+
+
     console.log(ExerciseIdsIntArray);
     fetch('/Workout/InsertExercises', {
         method: "POST",
@@ -279,7 +281,7 @@ function loadActiveWorkoutExercises(activeWorkoutObj) {
     loadLocalStorage();
 }
 function queryActiveWorkoutExercises() {
-    fetch('/Workout/ViewActiveWorkoutByUserId?UserId=' + UserId)
+    fetch('/Workout/ViewActiveWorkoutByUserId')
         .then(response => response.json())
         .then(data => {
             // Caches the retrieved workout data into localstorage to prevent multiple API requests to the database upon page refresh
@@ -574,7 +576,7 @@ function submitButtonClicked() {
             WorkoutData: setsData
         }));
 
-        fetch('/Workout/SubmitWorkout?UserId=' + UserId, {
+        fetch('/Workout/SubmitWorkout', {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
