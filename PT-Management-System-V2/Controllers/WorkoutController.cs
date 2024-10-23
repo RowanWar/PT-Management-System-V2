@@ -97,9 +97,9 @@ namespace PT_Management_System_V2.Controllers
         public async Task<IActionResult> InsertExercises([FromBody] JsonElement data)
         {
 
-            int WorkoutId = data.GetProperty("WorkoutId").GetInt32();
-            List<int> ExerciseIds = JsonSerializer.Deserialize<List<int>>(data.GetProperty("ExerciseIds").ToString());
-            List<int> setIdsArr = await _workoutDAO.AddExercisesToDatabase(WorkoutId, ExerciseIds);
+            int workoutId = data.GetProperty("WorkoutId").GetInt32();
+            List<int> exerciseIds = JsonSerializer.Deserialize<List<int>>(data.GetProperty("ExerciseIds").ToString());
+            List<int> setIdsArr = await _workoutDAO.AddExercisesToDatabase(workoutId, exerciseIds);
 
             // Adds a default empty set to every exercise created by the user for display purposes.
             int result = await _workoutDAO.AddSetToDatabase(setIdsArr);

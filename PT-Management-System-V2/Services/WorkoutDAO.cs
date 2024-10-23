@@ -763,7 +763,7 @@ public class WorkoutDAO /*: IWorkoutDataService*/
                         ExerciseName = e.ExerciseName,
                         MuscleGroup = e.MuscleGroup,
                         Notes = we.Notes,
-                        //WorkoutExerciseId = s.WorkoutExerciseId,
+                        WorkoutExerciseId = we.WorkoutExerciseId,
                         SetId = s.SetId,
                         Weight = s.Weight,
                         Reps = s.Reps,

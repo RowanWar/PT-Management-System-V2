@@ -3,7 +3,6 @@ let second = 00;
 let count = 00;
 
 // Static for now, this should be fetched later upon user login.
-const UserId = 1;
 let WorkoutId = null;
 
 
@@ -132,6 +131,7 @@ function submitExercises() {
         .then(response => response.json())
         .then(data => {
             localStorage.removeItem("cachedWorkout");
+            console.log('This data' + data);
             loadActiveWorkoutExercises(data);
         })
         .catch(error => {
@@ -193,14 +193,15 @@ function loadActiveWorkoutExercises(activeWorkoutObj) {
     activeWorkoutContainer.appendChild(generateTable);
 
     // Dictates the list of columns to be displayed on the page
-    const columnNames = ["SetsCount", "WeightPerSet", "RepsPerSet", "SetCategoryArray"];
+    const columnNames = [/*"SetsCount",*/ "WeightPerSet", "RepsPerSet", "SetCategoryArray"];
 
     // Track the WorkoutExerciseIds we've already processed
     let processedWorkoutExerciseIds = new Set();
+    
 
     // Iterate through each item in activeWorkoutObj
     activeWorkoutObj.forEach(workout => {
-        //console.log(workout);
+        console.log(workout);
 
         // Only create a header row if one does not already currently exist for this WorkoutExerciseId (1 header only per exercise)
         if (!processedWorkoutExerciseIds.has(workout["WorkoutExerciseId"])) {
@@ -213,16 +214,16 @@ function loadActiveWorkoutExercises(activeWorkoutObj) {
             newRowHead.setAttribute("headerworkoutexerciseid", workout["WorkoutExerciseId"]);
             newRowHead.addEventListener("click", collapseExerciseSets);
 
-            let newCellHeadSetsCount = newRowHead.insertCell();
+            //let newCellHeadSetsCount = newRowHead.insertCell();
             let newCellHeadExerciseName = newRowHead.insertCell();
 
             let cellExerciseName = workout["ExerciseName"];
-            let cellNoOfSetsValue = workout["SetsCount"];
+            //let cellNoOfSetsValue = workout["SetsCount"];
 
             let textNodeExerciseName = document.createTextNode(cellExerciseName);
-            let textNodeSets = document.createTextNode(cellNoOfSetsValue);
+            //let textNodeSets = document.createTextNode(cellNoOfSetsValue);
 
-            newCellHeadSetsCount.appendChild(textNodeSets);
+            //newCellHeadSetsCount.appendChild(textNodeSets);
             newCellHeadExerciseName.appendChild(textNodeExerciseName);
 
             // Generate the button which marks a set as complete
