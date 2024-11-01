@@ -1,0 +1,76 @@
+﻿@model IEnumerable<PT_Management_System_V2.Data.EntityFrameworkModels.WeeklyReport>
+
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p>Some text in the Modal..</p>
+        @* Placeholder div for loading the images into it when user clicks "View Images" *@
+        <div class="images-div">
+        </div>
+    </div>
+
+</div>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+@* <h1>
+    @Html.DisplayFor(@item => item.)
+</h1> *@
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Notes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CheckInDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CheckInWeight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateCreated)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateDeleted)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Notes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CheckInDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CheckInWeight)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateCreated)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateDeleted)
+                </td>
+                <td>
+                    <a asp-action="Images" asp-route-id="@item.WeeklyReportId">View Photos</a> |
+                    <a asp-action="Edit" asp-route-id="@item.WeeklyReportId">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.WeeklyReportId">Delete</a>
+                    @* Assigns the ID of the weeklyreport as the buttons id which can then be passed to the controller to execute the SQL query *@
+                    <button id="@item.WeeklyReportId" class="getResultButton" onClick="buttonClicked(this.id)">View images</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@* <script src="~/js/client_ClientReport.js"></script> *@

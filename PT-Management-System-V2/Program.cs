@@ -53,6 +53,13 @@ builder.Services.AddSingleton<ReportDAO>(provider =>
     return new ReportDAO(contextFactory);
 });
 
+// Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
+builder.Services.AddSingleton<YourCoachDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new YourCoachDAO(contextFactory);
+});
+
 // Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();
 
