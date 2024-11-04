@@ -21,8 +21,25 @@ public class YourCoachDAO
     }
 
 
+    public async Task<int> GetClientIdFromUserId(string contextUserId)
+    {
+        // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
+        using var _context = _contextFactory.CreateDbContext();
+
+        var ClientId = await (
+            from c in _context.Clients
+            where c.UserId == contextUserId
+            select c.ClientId)
+            .FirstOrDefaultAsync();
+
+
+        return ClientId;
+    }
+
+
+
     // Returns the result as to whether the currently logged in user has a (coach_id) from the coach table, if so, returns this id
-    public async Task<List<YourCoach_ViewModel?>> DisplayCoach(string contextUserId)
+    public async Task<YourCoach_ViewModel?> DisplayCoach(string contextUserId)
     {
         // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
         using var _context = _contextFactory.CreateDbContext();
@@ -43,6 +60,10 @@ public class YourCoachDAO
                 CoachEmail = coach_user.Email,
                 CoachPhoneNumber = coach_user.PhoneNumber,
 
+                // Coach Model
+                CoachProfileDescription = coach.CoachProfileDescription,
+                CoachQualifications = coach.CoachQualifications,
+
                 // CoachClient details
                 MonthlyCharge = coach_client.MonthlyCharge,
                 StartDate = coach_client.ClientStartDate,
@@ -54,7 +75,7 @@ public class YourCoachDAO
                 ClientUserName = client_user.UserName,
                 ClientEmail = client_user.Email,
                 ClientPhoneNumber = client_user.PhoneNumber
-            }).ToListAsync();
+            }).FirstOrDefaultAsync();
 
         return data;
     }

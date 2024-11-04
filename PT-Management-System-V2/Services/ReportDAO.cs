@@ -44,4 +44,29 @@ public class ReportDAO /*: IClientDataService*/
         return reports;
     }
 
+
+    public async Task<List<WeeklyReport?>> GetAllWeeklyReportsOfUserByUser(int client_id)
+    {
+        using var _context = _contextFactory.CreateDbContext();
+
+        var reports = await
+        (from wr in _context.WeeklyReports
+             //join c in _context.Clients on cc.ClientId equals c.ClientId
+             //join u in _context.AspNetUsers on c.UserId equals u.Id
+         where wr.ClientId == client_id
+         select new WeeklyReport
+         {
+             // Client details
+             WeeklyReportId = wr.WeeklyReportId,
+             Notes = wr.Notes,
+             CheckInDate = wr.CheckInDate,
+             CheckInWeight = wr.CheckInWeight,
+             ClientId = wr.ClientId
+         }).ToListAsync();
+
+
+        return reports;
+    }
+
+
 }

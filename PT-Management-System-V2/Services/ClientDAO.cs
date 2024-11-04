@@ -22,7 +22,7 @@ public class ClientDAO : IClientDataService
     }
 
 
-    // Returns the result as to whether the currently logged in user has a (coach_id) from the coach table, if so, returns this id
+    // Returns the result as to whether the currently logged in user has a (coach_id) from the coach table, and if so, returns this id
     public async Task<Coach?> VerifyAndGetUsersCoachId(string contextUserId)
     {
         // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
@@ -34,9 +34,6 @@ public class ClientDAO : IClientDataService
 
         return coach;
     }
-
-
-
 
 
     public async Task<int> GetClientIdFromWorkoutId(string workoutId)
@@ -57,6 +54,7 @@ public class ClientDAO : IClientDataService
     }
     
 
+    // Verifies user initiating a query involving a client is that users coach and therefore authorized to view data relating to them
     public async Task<bool> VerifyUserIsClientsCoach(string clientId, int coachId)
     {
         using var _context = _contextFactory.CreateDbContext();
@@ -68,6 +66,9 @@ public class ClientDAO : IClientDataService
 
         return isMatch;
     }
+
+
+
 
     public int Delete(ClientModel client)
     {

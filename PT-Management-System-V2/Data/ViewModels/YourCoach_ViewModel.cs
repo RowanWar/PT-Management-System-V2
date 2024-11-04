@@ -1,10 +1,11 @@
-﻿using PT_Management_System_V2.Data.EntityFrameworkModels;
+﻿using Microsoft.EntityFrameworkCore;
+using PT_Management_System_V2.Data.EntityFrameworkModels;
 
 namespace PT_Management_System_V2.Data.ViewModels
 {
+    //[Keyless]
     public class YourCoach_ViewModel
     {
-
         // AspNetUser Model
         public string? CoachFirstName { get; set; }
 
