@@ -3,8 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Identity.Client;
+using PT_Management_System_V2.Data;
+using PT_Management_System_V2.Data.EntityFrameworkModels;
+using PT_Management_System_V2.Data.ViewModels;
 using PT_Management_System_V2.Models;
 using PT_Management_System_V2.Services;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Nodes; // Might be redundant
 
@@ -15,29 +19,38 @@ namespace PT_Management_System_V2.Controllers
     public class WorkoutController : Controller
     {
 
+        private readonly ApplicationDbContext _context;
 
-        // Why does this only work if I add this code in the controller? I don't understand why it wouldn't work just with the code in WorkoutDAO?
         private readonly WorkoutDAO _workoutDAO;
+        private readonly ClientDAO _clientDAO;
+        private readonly ReportDAO _reportDAO;
 
-        public WorkoutController(WorkoutDAO workoutDAO)
+        public WorkoutController(ApplicationDbContext context, IHttpContextAccessor httpContextAccessor, WorkoutDAO workoutDAO, ClientDAO clientDAO, ReportDAO reportDAO)
         {
+            _context = context;
             _workoutDAO = workoutDAO;
+            _clientDAO = clientDAO;
+            _reportDAO = reportDAO;
         }
 
 
+        //// Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
+        //static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
 
 
-        // Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
-        static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
-
-        // How can I avoid passing null (it expects a parameter).
-        //WorkoutDAO WorkoutDAO = new WorkoutDAO(null);
-
+        // Commented out for migration
         public IActionResult Index()
         {
+            // Grab the logged in users ID from the user authorization session context
+            var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Currently hard coded to use a user ID here. 
-            return View(_workoutDAO.GetAllWorkoutsByUserId(9));
+            if (contextUserId == null)
+            {
+                return NotFound();
+            }
+  
+
+            return View(_workoutDAO.GetAllWorkoutsByUserId(contextUserId));
         }
 
         public IActionResult CreateWorkout()
@@ -47,9 +60,17 @@ namespace PT_Management_System_V2.Controllers
         }
 
 
-        public IActionResult ViewActiveWorkoutByUserId(int UserId)
+        public async Task<IActionResult> ViewActiveWorkoutByUserId()
         {
-            List<WorkoutExercisesModel> viewActiveWorkout = _workoutDAO.ViewActiveWorkoutByUserId(UserId);
+            // Grab the logged in users ID from the user authorization session context
+            var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (contextUserId == null)
+            {
+                return NotFound();
+            }
+
+            List<WorkoutExercise_Workout_Set_Exercise_ViewModel> viewActiveWorkout = await _workoutDAO.ViewActiveWorkoutByUserId(contextUserId);
             string HasActiveWorkoutSerialized = JsonSerializer.Serialize(viewActiveWorkout);
 
 
@@ -76,9 +97,9 @@ namespace PT_Management_System_V2.Controllers
         public async Task<IActionResult> InsertExercises([FromBody] JsonElement data)
         {
 
-            int WorkoutId = data.GetProperty("WorkoutId").GetInt32();
-            List<int> ExerciseIds = JsonSerializer.Deserialize<List<int>>(data.GetProperty("ExerciseIds").ToString());
-            List<int> setIdsArr = await _workoutDAO.AddExercisesToDatabase(WorkoutId, ExerciseIds);
+            int workoutId = data.GetProperty("WorkoutId").GetInt32();
+            List<int> exerciseIds = JsonSerializer.Deserialize<List<int>>(data.GetProperty("ExerciseIds").ToString());
+            List<int> setIdsArr = await _workoutDAO.AddExercisesToDatabase(workoutId, exerciseIds);
 
             // Adds a default empty set to every exercise created by the user for display purposes.
             int result = await _workoutDAO.AddSetToDatabase(setIdsArr);
@@ -159,14 +180,23 @@ namespace PT_Management_System_V2.Controllers
         }   
         
 
-        public IActionResult CheckForActiveWorkout(int UserId)
+        public async Task<IActionResult> CheckForActiveWorkout()
         {
-            List<WorkoutModel> checkIfActiveWorkout = _workoutDAO.CheckActiveWorkoutByUserId(UserId);
+            // Grab the logged in users ID from the user authorization session context
+            var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            string resultSerialized = JsonSerializer.Serialize(checkIfActiveWorkout);
+            if (contextUserId == null)
+            {
+                return NotFound();
+            }
 
 
-            return Json(resultSerialized);
+            // Grabs the CoachId from the returned coach object
+            var activeWorkoutId = await _workoutDAO.CheckActiveWorkoutByUserId(contextUserId);
+            string activeWorkoutIdSerialized = JsonSerializer.Serialize(activeWorkoutId);
+
+
+            return Json(activeWorkoutIdSerialized);
         }
 
         //public IActionResult RemoveExerciseFromActiveWorkout(int WorkoutExerciseId)

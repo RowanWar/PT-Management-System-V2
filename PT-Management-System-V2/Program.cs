@@ -24,14 +24,21 @@ var connectionString = builder.Configuration["ConnectionStrings:PtSystemDb"] ?? 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString),
     optionsLifetime: ServiceLifetime.Singleton);
-//ConfigureDbContextOptions(options));
+
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString), 
     ServiceLifetime.Singleton);
-//ConfigureDbContextOptions(options));
 
-builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
+
+//builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
+// Registers WorkoutDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
+builder.Services.AddSingleton<WorkoutDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new WorkoutDAO(connectionString, contextFactory);
+});
+
 // Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
 builder.Services.AddSingleton<ClientDAO>(provider =>
     {
@@ -39,8 +46,19 @@ builder.Services.AddSingleton<ClientDAO>(provider =>
             return new ClientDAO(connectionString, contextFactory); 
     });
 
-//builder.Services.AddScoped<ClientDAO>(provider => new ClientDAO(connectionString)); // Supplying context with null as a TEMPORARY SOLUTION whilst I refactor raw SQL into Linq queries.
+// Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
+builder.Services.AddSingleton<ReportDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new ReportDAO(contextFactory);
+});
 
+// Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
+builder.Services.AddSingleton<YourCoachDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new YourCoachDAO(contextFactory);
+});
 
 // Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();

@@ -39,12 +39,13 @@ public class CoachAuthorizationHandler : AuthorizationHandler<CoachAuthorization
             return;
         }
 
-        // Grab the client_id being queried via queryParameter 
-        var clientId = _httpContextAccessor.HttpContext.Request.Query["client_id"].ToString();
+        // Grab the clientId and workoutId being queried via queryParameters (only one of these should be provided, not both)
+        var clientId = _httpContextAccessor.HttpContext.Request.Query["ClientId"].ToString();
+        var workoutId = _httpContextAccessor.HttpContext.Request.Query["WorkoutId"].ToString();
 
 
         // If no queryParameter passed of client_id > fail authorization
-        if (string.IsNullOrEmpty(clientId))
+        if (string.IsNullOrEmpty(clientId) && string.IsNullOrEmpty(workoutId))
         {
             context.Fail();
             return;
@@ -58,19 +59,49 @@ public class CoachAuthorizationHandler : AuthorizationHandler<CoachAuthorization
             context.Fail();
             return;
         }
- 
+
 
         // Join with the coach_client table and check if the (coach_id) matches the (client_id) being queried
         // Returns a true/false boolean as to whether the user initiating the query is the clients coach
-        var isMatch = await _clientDAO.VerifyUserIsClientsCoach(clientId, coach.CoachId);
+        // If clientId is provided, verify the coach-client relationship
+        if (!string.IsNullOrEmpty(clientId))
+        {
+            var isMatch = await _clientDAO.VerifyUserIsClientsCoach(clientId, coach.CoachId);
 
-        if (isMatch)
-        {
-            context.Succeed(requirement);
+            if (isMatch)
+            {
+                context.Succeed(requirement);
+            }
+            else
+            {
+                context.Fail();
+            }
         }
-        else
+        // If workoutId is provided, get the associated clientId from the workout and verify the relationship
+        else if (!string.IsNullOrEmpty(workoutId))
         {
-            context.Fail();
+            // Returns the ClientId of the user based on the workoutId
+            var workoutClientId = await _clientDAO.GetClientIdFromWorkoutId(workoutId);
+
+            if (workoutClientId != null)
+            {
+                string strClientId = workoutClientId.ToString();
+                var isMatch = await _clientDAO.VerifyUserIsClientsCoach(strClientId, coach.CoachId);
+
+                if (isMatch)
+                {
+                    context.Succeed(requirement);
+                }
+                else
+                {
+                    context.Fail();
+                }
+            }
+            else
+            {
+                // If no associated clientId was found for the workout, fail the authorization
+                context.Fail();
+            }
         }
 
     }

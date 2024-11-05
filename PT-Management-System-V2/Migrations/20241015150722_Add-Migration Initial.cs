@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace PT_Management_System_V2.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class AddMigrationInitial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -353,12 +353,12 @@ namespace PT_Management_System_V2.Migrations
             //    {
             //        client_id = table.Column<int>(type: "integer", nullable: false)
             //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-            //        contact_by_phone = table.Column<bool>(type: "boolean", nullable: true),
-            //        contact_by_email = table.Column<bool>(type: "boolean", nullable: true),
-            //        referred = table.Column<bool>(type: "boolean", nullable: true),
-            //        referral = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: true),
             //        UserId = table.Column<string>(type: "text", nullable: false),
-            //        ApplicationUserId = table.Column<string>(type: "text", nullable: true)
+            //        ApplicationUserId = table.Column<string>(type: "text", nullable: false),
+            //        ContactByPhone = table.Column<bool>(type: "boolean", nullable: true),
+            //        ContactByEmail = table.Column<bool>(type: "boolean", nullable: true),
+            //        Referred = table.Column<bool>(type: "boolean", nullable: true),
+            //        Referral = table.Column<string>(type: "text", nullable: true)
             //    },
             //    constraints: table =>
             //    {
@@ -367,10 +367,26 @@ namespace PT_Management_System_V2.Migrations
             //            name: "FK_client_AspNetUsers_ApplicationUserId",
             //            column: x => x.ApplicationUserId,
             //            principalTable: "AspNetUsers",
-            //            principalColumn: "Id");
+            //            principalColumn: "Id",
+            //            onDelete: ReferentialAction.Cascade);
+            //    });
+
+            //migrationBuilder.CreateTable(
+            //    name: "coach",
+            //    columns: table => new
+            //    {
+            //        coach_id = table.Column<int>(type: "integer", nullable: false)
+            //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            //        user_id = table.Column<string>(type: "text", nullable: false),
+            //        CoachProfileDescription = table.Column<string>(type: "text", nullable: true),
+            //        CoachQualifications = table.Column<string>(type: "text", nullable: true)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("coach_pkey", x => x.coach_id);
             //        table.ForeignKey(
-            //            name: "FK_client_AspNetUsers_UserId",
-            //            column: x => x.UserId,
+            //            name: "FK_Coach_AspNetUsers_Id",
+            //            column: x => x.user_id,
             //            principalTable: "AspNetUsers",
             //            principalColumn: "Id",
             //            onDelete: ReferentialAction.Cascade);
@@ -449,76 +465,35 @@ namespace PT_Management_System_V2.Migrations
             //    });
 
             //migrationBuilder.CreateTable(
-            //    name: "weekly_report",
-            //    columns: table => new
-            //    {
-            //        weekly_report_id = table.Column<int>(type: "integer", nullable: false)
-            //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-            //        user_id = table.Column<int>(type: "integer", nullable: true),
-            //        notes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-            //        check_in_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-            //        check_in_weight = table.Column<decimal>(type: "numeric(4,1)", precision: 4, scale: 1, nullable: true),
-            //        date_created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-            //        date_deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-            //    },
-            //    constraints: table =>
-            //    {
-            //        table.PrimaryKey("weekly_report_pkey", x => x.weekly_report_id);
-            //        table.ForeignKey(
-            //            name: "weekly_report_user_id_fkey",
-            //            column: x => x.user_id,
-            //            principalTable: "users",
-            //            principalColumn: "user_id");
-            //    });
-
-            //migrationBuilder.CreateTable(
             //    name: "workout",
             //    columns: table => new
             //    {
             //        workout_id = table.Column<int>(type: "integer", nullable: false)
             //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-            //        user_id = table.Column<int>(type: "integer", nullable: true),
+            //        UserId = table.Column<string>(type: "text", nullable: false),
             //        workout_date = table.Column<DateOnly>(type: "date", nullable: false),
             //        duration = table.Column<TimeSpan>(type: "interval", nullable: false),
             //        notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
             //        created_at = table.Column<DateTime>(type: "timestamp without time zone", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP"),
-            //        workout_active = table.Column<bool>(type: "boolean", nullable: true)
+            //        workout_active = table.Column<bool>(type: "boolean", nullable: true),
+            //        AspNetUserId = table.Column<string>(type: "text", nullable: false),
+            //        UserId1 = table.Column<int>(type: "integer", nullable: true)
             //    },
             //    constraints: table =>
             //    {
             //        table.PrimaryKey("workout_pkey", x => x.workout_id);
             //        table.ForeignKey(
-            //            name: "workout_user_id_fkey",
-            //            column: x => x.user_id,
-            //            principalTable: "users",
-            //            principalColumn: "user_id");
-            //    });
-
-            //migrationBuilder.CreateTable(
-            //    name: "coach",
-            //    columns: table => new
-            //    {
-            //        coach_id = table.Column<int>(type: "integer", nullable: false)
-            //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-            //        user_id = table.Column<string>(type: "text", nullable: false),
-            //        coach_profile_description = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-            //        coach_qualifications = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-            //        CoachClientClientId = table.Column<int>(type: "integer", nullable: true)
-            //    },
-            //    constraints: table =>
-            //    {
-            //        table.PrimaryKey("coach_pkey", x => x.coach_id);
-            //        table.ForeignKey(
-            //            name: "Coach_AspNetUsers_Id_Fkey",
-            //            column: x => x.user_id,
+            //            name: "FK_workout_AspNetUsers_AspNetUserId",
+            //            column: x => x.AspNetUserId,
+            //            principalSchema: "public",
             //            principalTable: "AspNetUsers",
             //            principalColumn: "Id",
             //            onDelete: ReferentialAction.Cascade);
             //        table.ForeignKey(
-            //            name: "FK_coach_client_CoachClientClientId",
-            //            column: x => x.CoachClientClientId,
-            //            principalTable: "client",
-            //            principalColumn: "client_id");
+            //            name: "FK_workout_users_UserId1",
+            //            column: x => x.UserId1,
+            //            principalTable: "users",
+            //            principalColumn: "user_id");
             //    });
 
             //migrationBuilder.CreateTable(
@@ -543,29 +518,59 @@ namespace PT_Management_System_V2.Migrations
             //    });
 
             //migrationBuilder.CreateTable(
-            //    name: "weekly_report_image",
+            //    name: "weekly_report",
             //    columns: table => new
             //    {
-            //        weekly_report_image_id = table.Column<int>(type: "integer", nullable: false)
+            //        weekly_report_id = table.Column<int>(type: "integer", nullable: false)
             //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-            //        weekly_report_id = table.Column<int>(type: "integer", nullable: true),
-            //        image_id = table.Column<int>(type: "integer", nullable: true),
+            //        client_id = table.Column<int>(type: "integer", nullable: true),
+            //        notes = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
+            //        check_in_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+            //        check_in_weight = table.Column<decimal>(type: "numeric(4,1)", precision: 4, scale: 1, nullable: true),
             //        date_created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-            //        date_deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+            //        date_deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+            //        UserId = table.Column<int>(type: "integer", nullable: true)
             //    },
             //    constraints: table =>
             //    {
-            //        table.PrimaryKey("weekly_report_image_pkey", x => x.weekly_report_image_id);
+            //        table.PrimaryKey("weekly_report_pkey", x => x.weekly_report_id);
             //        table.ForeignKey(
-            //            name: "weekly_report_image_image_id_fkey",
-            //            column: x => x.image_id,
-            //            principalTable: "image",
-            //            principalColumn: "image_id");
+            //            name: "FK_weekly_report_users_UserId",
+            //            column: x => x.UserId,
+            //            principalTable: "users",
+            //            principalColumn: "user_id");
             //        table.ForeignKey(
-            //            name: "weekly_report_image_weekly_report_id_fkey",
-            //            column: x => x.weekly_report_id,
-            //            principalTable: "weekly_report",
-            //            principalColumn: "weekly_report_id");
+            //            name: "weekly_report_user_id_fkey",
+            //            column: x => x.client_id,
+            //            principalTable: "client",
+            //            principalColumn: "client_id");
+            //    });
+
+            //migrationBuilder.CreateTable(
+            //    name: "coach_client",
+            //    columns: table => new
+            //    {
+            //        coach_id = table.Column<int>(type: "integer", nullable: false),
+            //        client_id = table.Column<int>(type: "integer", nullable: false),
+            //        monthly_charge = table.Column<int>(type: "integer", nullable: false),
+            //        client_start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+            //        client_end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+            //    },
+            //    constraints: table =>
+            //    {
+            //        table.PrimaryKey("PK_coach_client", x => new { x.coach_id, x.client_id });
+            //        table.ForeignKey(
+            //            name: "coach_client_client_id_fkey",
+            //            column: x => x.client_id,
+            //            principalTable: "client",
+            //            principalColumn: "client_id",
+            //            onDelete: ReferentialAction.Cascade);
+            //        table.ForeignKey(
+            //            name: "coach_client_coach_id_fkey",
+            //            column: x => x.coach_id,
+            //            principalTable: "coach",
+            //            principalColumn: "coach_id",
+            //            onDelete: ReferentialAction.Cascade);
             //    });
 
             //migrationBuilder.CreateTable(
@@ -595,30 +600,29 @@ namespace PT_Management_System_V2.Migrations
             //    });
 
             //migrationBuilder.CreateTable(
-            //    name: "coach_client",
+            //    name: "weekly_report_image",
             //    columns: table => new
             //    {
-            //        coach_id = table.Column<int>(type: "integer", nullable: false),
-            //        client_id = table.Column<int>(type: "integer", nullable: false),
-            //        monthly_charge = table.Column<int>(type: "integer", nullable: false),
-            //        client_start_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-            //        client_end_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+            //        weekly_report_image_id = table.Column<int>(type: "integer", nullable: false)
+            //            .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+            //        weekly_report_id = table.Column<int>(type: "integer", nullable: true),
+            //        image_id = table.Column<int>(type: "integer", nullable: true),
+            //        date_created = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+            //        date_deleted = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
             //    },
             //    constraints: table =>
             //    {
-            //        table.PrimaryKey("PK_coach_client", x => new { x.coach_id, x.client_id });
+            //        table.PrimaryKey("weekly_report_image_pkey", x => x.weekly_report_image_id);
             //        table.ForeignKey(
-            //            name: "coach_client_client_id_fkey",
-            //            column: x => x.client_id,
-            //            principalTable: "client",
-            //            principalColumn: "client_id",
-            //            onDelete: ReferentialAction.Cascade);
+            //            name: "weekly_report_image_image_id_fkey",
+            //            column: x => x.image_id,
+            //            principalTable: "image",
+            //            principalColumn: "image_id");
             //        table.ForeignKey(
-            //            name: "coach_client_coach_id_fkey",
-            //            column: x => x.coach_id,
-            //            principalTable: "coach",
-            //            principalColumn: "coach_id",
-            //            onDelete: ReferentialAction.Cascade);
+            //            name: "weekly_report_image_weekly_report_id_fkey",
+            //            column: x => x.weekly_report_id,
+            //            principalTable: "weekly_report",
+            //            principalColumn: "weekly_report_id");
             //    });
 
             //migrationBuilder.CreateTable(
@@ -735,11 +739,6 @@ namespace PT_Management_System_V2.Migrations
             //    column: "UserId");
 
             //migrationBuilder.CreateIndex(
-            //    name: "IX_coach_CoachClientClientId",
-            //    table: "coach",
-            //    column: "CoachClientClientId");
-
-            //migrationBuilder.CreateIndex(
             //    name: "IX_coach_user_id",
             //    table: "coach",
             //    column: "user_id");
@@ -788,9 +787,14 @@ namespace PT_Management_System_V2.Migrations
             //    unique: true);
 
             //migrationBuilder.CreateIndex(
-            //    name: "IX_weekly_report_user_id",
+            //    name: "IX_weekly_report_client_id",
             //    table: "weekly_report",
-            //    column: "user_id");
+            //    column: "client_id");
+
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_weekly_report_UserId",
+            //    table: "weekly_report",
+            //    column: "UserId");
 
             //migrationBuilder.CreateIndex(
             //    name: "IX_weekly_report_image_image_id",
@@ -803,9 +807,14 @@ namespace PT_Management_System_V2.Migrations
             //    column: "weekly_report_id");
 
             //migrationBuilder.CreateIndex(
-            //    name: "IX_workout_user_id",
+            //    name: "IX_workout_AspNetUserId",
             //    table: "workout",
-            //    column: "user_id");
+            //    column: "AspNetUserId");
+
+            //migrationBuilder.CreateIndex(
+            //    name: "IX_workout_UserId1",
+            //    table: "workout",
+            //    column: "UserId1");
 
             //migrationBuilder.CreateIndex(
             //    name: "IX_workout_exercise_exercise_id",
@@ -878,10 +887,6 @@ namespace PT_Management_System_V2.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers",
-                schema: "public");
-
-            migrationBuilder.DropTable(
                 name: "coach");
 
             migrationBuilder.DropTable(
@@ -900,19 +905,23 @@ namespace PT_Management_System_V2.Migrations
                 name: "weekly_report");
 
             migrationBuilder.DropTable(
-                name: "client");
-
-            migrationBuilder.DropTable(
                 name: "exercise");
 
             migrationBuilder.DropTable(
                 name: "workout");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "client");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "users");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

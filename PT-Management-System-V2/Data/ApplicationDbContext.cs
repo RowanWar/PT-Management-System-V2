@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using PT_Management_System_V2.Data.EntityFrameworkModels;
-using PT_Management_System_V2.Data.Models;
+//using PT_Management_System_V2.Data.Models;
 
 namespace PT_Management_System_V2.Data;
 
@@ -52,7 +53,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<SetCategory> SetCategories { get; set; }
 
-    public virtual DbSet<User> Users { get; set; }
+    //public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<WeeklyReport> WeeklyReports { get; set; }
 
@@ -124,6 +125,13 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                         j.ToTable("AspNetUserRoles", "identity");
                         j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
                     });
+
+            ////// One-to-many relationship between AspNetUser and Workout
+            //entity.HasMany(e => e.Workouts)        // AspNetUser has many Workouts
+            //    .WithOne(e => e.AspNetUser)        // Each Workout has one AspNetUser
+            //                                       //.HasForeignKey(e => e.AspNetUserWorkoutUserId)      // Foreign key on Workout is UserId
+            //    .HasPrincipalKey(e => e.Id);        // Principal key is Id on AspNetUser
+            //    //.HasConstraintName("FK_AspNetUser_Workouts");  // Optional FK constraint name
         });
 
 
@@ -453,10 +461,11 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.Notes)
                 .HasMaxLength(1000)
                 .HasColumnName("notes");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ClientId).HasColumnName("client_id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.WeeklyReports)
-                .HasForeignKey(d => d.UserId)
+            entity.HasOne(d => d.Client)
+                .WithMany(p => p.WeeklyReports)
+                .HasForeignKey(d => d.ClientId)
                 .HasConstraintName("weekly_report_user_id_fkey");
         });
 
@@ -496,14 +505,42 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.Notes)
                 .HasMaxLength(500)
                 .HasColumnName("notes");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.WorkoutActive).HasColumnName("workout_active");
             entity.Property(e => e.WorkoutDate).HasColumnName("workout_date");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Workouts)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("workout_user_id_fkey");
+            entity.Property(e => e.WorkoutUserId)
+                .IsRequired()
+                .HasColumnName("UserId");
+
+            entity.HasOne(d => d.AspNetUser)
+                .WithMany(p => p.Workouts)
+                .HasPrincipalKey(u => u.Id)
+                .HasForeignKey(d => d.WorkoutUserId)
+                .HasConstraintName("FK_workout_UserId");
+
+
+            //entity.Property(e => e.WorkoutUserId)
+            //    .HasColumnName("UserId");
+            ////.IsRequired(true);
+
+            ////// Foreign Key relationship with AspNetUsers
+            ////entity.HasOne(d => d.AspNetUser)
+            ////      .WithMany(p => p.Workouts)
+            ////      .HasForeignKey(d => d.WkoutUserId)
+            ////      .OnDelete(DeleteBehavior.Cascade)
+            ////      .HasConstraintName("FK_workout_UserId");
+
+            //entity.HasOne(d => d.AspNetUser)
+            //    .WithMany(p => p.Workouts)
+            //    .HasPrincipalKey(u => u.Id)
+            //    .HasForeignKey(d => d.WorkoutUserId)
+            //    .HasConstraintName("FK_workout_UserId");
         });
+
+
+
+        string debugModel = modelBuilder.Model.ToDebugString();
+        Debug.WriteLine(debugModel);
 
         modelBuilder.Entity<WorkoutExercise>(entity =>
         {

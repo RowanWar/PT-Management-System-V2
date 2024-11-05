@@ -25,5 +25,7 @@ public partial class Client
     // Navigation property to CoachClient
     public ICollection<CoachClient> CoachClients { get; set; }
 
+    public ICollection<WeeklyReport> WeeklyReports { get; set; }
+
     public ApplicationUser User { get; set; }
 }

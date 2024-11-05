@@ -683,6 +683,10 @@ namespace PT_Management_System_V2.Migrations
                         .HasColumnType("numeric(4,1)")
                         .HasColumnName("check_in_weight");
 
+                    b.Property<int?>("ClientId")
+                        .HasColumnType("integer")
+                        .HasColumnName("client_id");
+
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("date_created");
@@ -697,11 +701,12 @@ namespace PT_Management_System_V2.Migrations
                         .HasColumnName("notes");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
 
                     b.HasKey("WeeklyReportId")
                         .HasName("weekly_report_pkey");
+
+                    b.HasIndex("ClientId");
 
                     b.HasIndex("UserId");
 
@@ -768,8 +773,12 @@ namespace PT_Management_System_V2.Migrations
                         .HasColumnName("notes");
 
                     b.Property<int?>("UserId")
-                        .HasColumnType("integer")
-                        .HasColumnName("user_id");
+                        .HasColumnType("integer");
+
+                    b.Property<string>("WkoutUserId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("UserId");
 
                     b.Property<bool?>("WorkoutActive")
                         .HasColumnType("boolean")
@@ -784,7 +793,13 @@ namespace PT_Management_System_V2.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("workout", (string)null);
+                    b.HasIndex("WkoutUserId");
+
+                    b.ToTable("workout", null, t =>
+                        {
+                            t.Property("UserId")
+                                .HasColumnName("UserId1");
+                        });
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutExercise", b =>
@@ -1149,12 +1164,16 @@ namespace PT_Management_System_V2.Migrations
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WeeklyReport", b =>
                 {
-                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.User", "User")
+                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.Client", "Client")
                         .WithMany("WeeklyReports")
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("ClientId")
                         .HasConstraintName("weekly_report_user_id_fkey");
 
-                    b.Navigation("User");
+                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.User", null)
+                        .WithMany("WeeklyReports")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Client");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WeeklyReportImage", b =>
@@ -1176,12 +1195,18 @@ namespace PT_Management_System_V2.Migrations
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Workout", b =>
                 {
-                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.User", "User")
+                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.User", null)
                         .WithMany("Workouts")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("workout_user_id_fkey");
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("User");
+                    b.HasOne("PT_Management_System_V2.Data.Models.AspNetUser", "AspNetUser")
+                        .WithMany("Workouts")
+                        .HasForeignKey("WkoutUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_workout_UserId");
+
+                    b.Navigation("AspNetUser");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutExercise", b =>
@@ -1237,6 +1262,8 @@ namespace PT_Management_System_V2.Migrations
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Client", b =>
                 {
                     b.Navigation("CoachClients");
+
+                    b.Navigation("WeeklyReports");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Coach", b =>
@@ -1291,6 +1318,8 @@ namespace PT_Management_System_V2.Migrations
                     b.Navigation("AspNetUserClaims");
 
                     b.Navigation("AspNetUserTokens");
+
+                    b.Navigation("Workouts");
                 });
 #pragma warning restore 612, 618
         }

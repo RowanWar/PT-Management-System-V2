@@ -1,7 +1,10 @@
-﻿using System;
+﻿using PT_Management_System_V2.Data.EntityFrameworkModels;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PT_Management_System_V2.Data.Models;
+//namespace PT_Management_System_V2.Data.Models;
+namespace PT_Management_System_V2.Data.EntityFrameworkModels;
 
 public partial class AspNetUser
 {
@@ -48,4 +51,7 @@ public partial class AspNetUser
     public virtual ICollection<AspNetUserToken> AspNetUserTokens { get; set; } = new List<AspNetUserToken>();
 
     public virtual ICollection<AspNetRole> Roles { get; set; } = new List<AspNetRole>();
+
+    //[ForeignKey("UserIdTest2")]
+    public virtual ICollection<Workout> Workouts { get; set; } = new List<Workout>();
 }

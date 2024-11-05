@@ -1,0 +1,82 @@
+﻿@model IEnumerable<PT_Management_System_V2.Data.ViewModels.WorkoutExercise_Workout_Set_Exercise_ViewModel>
+<link rel="stylesheet" href="~/css/workoutDetails.css" />
+
+
+
+<h4>Details of a client </h4>
+<hr />
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Set Count
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WorkoutExerciseId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SetCategoryType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Reps)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            string currentExerciseName = null;
+            int setCount = 0;
+        }
+        @foreach (var item in Model)
+        {
+            if (currentExerciseName != item.ExerciseName)
+            {
+                currentExerciseName = item.ExerciseName;
+                setCount = 1;
+            }
+            else
+            {
+                setCount++;
+            }
+            <tr>
+                <td>
+                    @setCount
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WorkoutExerciseId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExerciseName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Weight)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SetCategoryType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reps)
+                </td>
+                <td>
+                    @Html.ActionLink("Workout Details", "WorkoutDetails", new { item.WorkoutId })
+                    @* <a asp-action="Details" asp-route-id="@item.WorkoutId">View Workout</a> | *@
+                    @* <a asp-action="Delete" asp-route-id="@item.WorkoutId">Delete</a> *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<script src="~/js/workout_WorkoutDetails.js"></script>

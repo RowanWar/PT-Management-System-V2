@@ -1,4 +1,4 @@
-﻿@model IEnumerable<PT_Management_System_V2.Models.WorkoutExerciseModel>
+﻿@model IEnumerable<PT_Management_System_V2.Data.EntityFrameworkModels.Workout>
 
 <p>
     Client Workout Page
@@ -6,8 +6,11 @@
 <table class="table">
     <thead>
         <tr>
+@*             <th>
+                @Html.DisplayNameFor(model => model.WorkoutName)
+            </th> *@
             <th>
-                @Html.DisplayNameFor(model => model.UserId)
+                @Html.DisplayNameFor(model => model.WorkoutActive)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.WorkoutDate)
@@ -16,7 +19,7 @@
                 @Html.DisplayNameFor(model => model.Duration)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
+                @Html.DisplayNameFor(model => model.WorkoutId)
             </th>
             <th></th>
         </tr>
@@ -24,8 +27,11 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
+@*             <td>
+                @Html.DisplayFor(modelItem => item.WorkoutName)
+            </td> *@
             <td>
-                @Html.DisplayFor(modelItem => item.UserId)
+                @Html.DisplayFor(modelItem => item.WorkoutActive)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.WorkoutDate)
@@ -34,7 +40,7 @@
                 @Html.DisplayFor(modelItem => item.Duration)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
+                @Html.DisplayFor(modelItem => item.WorkoutId)
             </td>
             <td>
                 @Html.ActionLink("Workout Details", "WorkoutDetails", new { item.WorkoutId })

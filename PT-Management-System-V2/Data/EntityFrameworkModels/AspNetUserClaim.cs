@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace PT_Management_System_V2.Data.Models;
+namespace PT_Management_System_V2.Data.EntityFrameworkModels;
 
 public partial class AspNetUserClaim
 {

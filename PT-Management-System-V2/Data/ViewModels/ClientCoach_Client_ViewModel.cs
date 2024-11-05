@@ -2,9 +2,9 @@
 
 namespace PT_Management_System_V2.Data.ViewModels
 {
-    public class ClientCoach_ClientViewModel
+    public class ClientCoach_Client_ViewModel
     {
-        // Client Model
+        // WorkoutExercise Model
         public int ClientId { get; set; }
 
         // Foreign key to AspNetUser (Id)
@@ -21,7 +21,7 @@ namespace PT_Management_System_V2.Data.ViewModels
 
 
 
-        // CoachClient Model
+        // Workout Model
 
         public int MonthlyCharge { get; set; }
 
@@ -30,7 +30,7 @@ namespace PT_Management_System_V2.Data.ViewModels
         public DateTime? ClientEndDate { get; set; }
 
 
-        // AspNetUsers Model
+        // Client Model
         public string? FirstName { get; set; }
 
         public string? LastName { get; set; }

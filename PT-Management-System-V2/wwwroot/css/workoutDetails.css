@@ -1,14 +1,31 @@
 ﻿body {
+
 }
 
-/*.table {
-    border-spacing: 50px;
-    padding: 50px;
-}*/
+.table {
+    /*border-spacing: 2em;*/
+    border-collapse: collapse; /* [1] */
+}
+
+
+
+.exercise-parent-row {
+    /*background: #272727;*/
+}
+
+.exercise-parent-row {
+    border-top: 2em solid transparent;
+    background: #1f1f1f;
+    /*border: 3px solid red;
+
+    background: #1f1f1f;
+    border-top: 2em solid transparent;*/ /* [2] */
+    /*background-clip: padding-box;*/ /* [4] */
+}
 
 .child-hidden-row {
-    padding: 10em;
-    color: red;
-    border-style: dotted;
-    border: 0;
+    border-top: 0.5em solid transparent;
+    /*background: #1f1f1f;
+    border-top: 0.5em solid transparent;*/ /* [2] */
+    /*background-clip: padding-box;*/ /* [4] */
 }
