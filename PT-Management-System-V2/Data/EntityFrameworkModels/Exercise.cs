@@ -18,4 +18,6 @@ public partial class Exercise
     public int? UserId { get; set; }
 
     public virtual ICollection<WorkoutExercise> WorkoutExercises { get; set; } = new List<WorkoutExercise>();
+
+    public ICollection<WorkoutProgramExercise> WorkoutProgramExercises { get; set; }
 }

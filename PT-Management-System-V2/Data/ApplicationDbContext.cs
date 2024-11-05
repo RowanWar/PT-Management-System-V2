@@ -63,6 +63,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<WorkoutExercise> WorkoutExercises { get; set; }
 
+    public virtual DbSet<WorkoutProgram> WorkoutPrograms { get; set; }
 
 
     // Modelbuilder is for the purpose of Entity Framework Core to know the relationship and how to map entities to the database
@@ -125,13 +126,6 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                         j.ToTable("AspNetUserRoles", "identity");
                         j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
                     });
-
-            ////// One-to-many relationship between AspNetUser and Workout
-            //entity.HasMany(e => e.Workouts)        // AspNetUser has many Workouts
-            //    .WithOne(e => e.AspNetUser)        // Each Workout has one AspNetUser
-            //                                       //.HasForeignKey(e => e.AspNetUserWorkoutUserId)      // Foreign key on Workout is UserId
-            //    .HasPrincipalKey(e => e.Id);        // Principal key is Id on AspNetUser
-            //    //.HasConstraintName("FK_AspNetUser_Workouts");  // Optional FK constraint name
         });
 
 
@@ -159,7 +153,51 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // End of Identity
 
 
+        //modelBuilder.Entity<Client>()
+        //    .HasOne(c => c.WorkoutProgram)
+        //    .WithMany(wp => wp.Clients)
+        //    .HasForeignKey(c => c.WorkoutProgramId)
+        //    // If a program is deleted, set client's WorkoutProgramId to null
+        //    .OnDelete(DeleteBehavior.SetNull); 
 
+
+
+        //modelBuilder.Entity<Client>(entity =>
+        //{
+        //    entity.ToTable("client");
+
+        //    entity.HasKey(e => e.ClientId)
+        //          .HasName("client_pkey");
+
+        //    entity.Property(e => e.ClientId)
+        //          .HasColumnName("client_id");
+
+        //    entity.Property(e => e.UserId)
+        //          .IsRequired()
+        //          .HasColumnName("UserId");
+
+        //    entity.Property(e => e.ApplicationUserId)
+        //          .HasColumnName("ApplicationUserId");
+
+        //    // Foreign Key relationship with AspNetUsers (UserId)
+        //    entity.HasOne(d => d.User)
+        //          .WithMany() // No navigation property on AspNetUsers
+        //          .HasForeignKey(d => d.UserId)
+        //          .OnDelete(DeleteBehavior.Cascade)
+        //          .HasConstraintName("FK_client_AspNetUsers_UserId");
+
+        //    // Foreign Key relationship with AspNetUsers (ApplicationUserId)
+        //    entity.HasOne(d => d.User)
+        //          .WithMany() // No navigation property on AspNetUsers
+        //          .HasForeignKey(d => d.ApplicationUserId)
+        //          .HasConstraintName("FK_client_AspNetUsers_ApplicationUserId");
+
+        //    entity.HasIndex(e => e.UserId)
+        //          .HasDatabaseName("IX_client_UserId");
+
+        //    entity.HasIndex(e => e.ApplicationUserId)
+        //          .HasDatabaseName("IX_client_ApplicationUserId");
+        //});
 
 
         modelBuilder.Entity<Client>(entity =>
@@ -179,6 +217,12 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.ApplicationUserId)
                   .HasColumnName("ApplicationUserId");
 
+            // Foreign Key relationship with WorkoutProgram
+            entity.HasOne(c => c.WorkoutProgram)
+                  .WithMany(wp => wp.Clients)
+                  .HasForeignKey(c => c.WorkoutProgramId)
+                  .OnDelete(DeleteBehavior.SetNull); // Set WorkoutProgramId to null if the program is deleted
+
             // Foreign Key relationship with AspNetUsers (UserId)
             entity.HasOne(d => d.User)
                   .WithMany() // No navigation property on AspNetUsers
@@ -192,6 +236,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .HasForeignKey(d => d.ApplicationUserId)
                   .HasConstraintName("FK_client_AspNetUsers_ApplicationUserId");
 
+            // Indexes
             entity.HasIndex(e => e.UserId)
                   .HasDatabaseName("IX_client_UserId");
 
@@ -199,6 +244,38 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .HasDatabaseName("IX_client_ApplicationUserId");
         });
 
+        // Configuration for WorkoutProgram entity
+        modelBuilder.Entity<WorkoutProgram>(entity =>
+        {
+            entity.Property(wp => wp.IsDefault)
+                  .HasDefaultValue(false);
+
+            entity.Property(wp => wp.CreatedByUserId)
+                  .IsRequired(false);
+
+            // Foreign Key relationship for CreatedByUserId with AspNetUsers (User who created the workout program)
+            entity.HasOne<AspNetUser>()
+                  .WithMany() // No navigation property needed on AspNetUsers
+                  .HasForeignKey(wp => wp.CreatedByUserId)
+                  .OnDelete(DeleteBehavior.Restrict) // Prevent deletion of user if associated with a WorkoutProgram
+                  .HasConstraintName("FK_WorkoutProgram_AspNetUsers_CreatedByUserId");
+        });
+
+        // Fixes the many-to-many relationship between Exercise and WorkoutProgram
+        modelBuilder.Entity<WorkoutProgramExercise>()
+            .HasKey(wpe => new { wpe.WorkoutProgramId, wpe.ExerciseId });
+
+        modelBuilder.Entity<WorkoutProgramExercise>()
+            .HasOne(wpe => wpe.WorkoutProgram)
+            .WithMany(wp => wp.WorkoutProgramExercises)
+            .HasForeignKey(wpe => wpe.WorkoutProgramId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<WorkoutProgramExercise>()
+            .HasOne(wpe => wpe.Exercise)
+            .WithMany(e => e.WorkoutProgramExercises)
+            .HasForeignKey(wpe => wpe.ExerciseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
 
         modelBuilder.Entity<ClientMeasurement>(entity =>

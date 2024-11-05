@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PT_Management_System_V2.Data;
@@ -11,9 +12,11 @@ using PT_Management_System_V2.Data;
 namespace PT_Management_System_V2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241105143939_AddWorkoutProgramTable")]
+    partial class AddWorkoutProgramTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1030,9 +1033,6 @@ namespace PT_Management_System_V2.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WorkoutProgramId"));
 
-                    b.Property<string>("CreatedByUserId")
-                        .HasColumnType("text");
-
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text");
@@ -1043,11 +1043,6 @@ namespace PT_Management_System_V2.Migrations
 
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsDefault")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
 
                     b.Property<int>("ProgramLength")
                         .HasColumnType("integer");
@@ -1068,24 +1063,7 @@ namespace PT_Management_System_V2.Migrations
 
                     b.HasKey("WorkoutProgramId");
 
-                    b.HasIndex("CreatedByUserId");
-
                     b.ToTable("WorkoutPrograms");
-                });
-
-            modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutProgramExercise", b =>
-                {
-                    b.Property<int>("WorkoutProgramId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("WorkoutProgramId", "ExerciseId");
-
-                    b.HasIndex("ExerciseId");
-
-                    b.ToTable("WorkoutProgramExercise");
                 });
 
             modelBuilder.Entity("AspNetUserRole", b =>
@@ -1337,34 +1315,6 @@ namespace PT_Management_System_V2.Migrations
                     b.Navigation("Workout");
                 });
 
-            modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutProgram", b =>
-                {
-                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.AspNetUser", null)
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("FK_WorkoutProgram_AspNetUsers_CreatedByUserId");
-                });
-
-            modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutProgramExercise", b =>
-                {
-                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.Exercise", "Exercise")
-                        .WithMany("WorkoutProgramExercises")
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutProgram", "WorkoutProgram")
-                        .WithMany("WorkoutProgramExercises")
-                        .HasForeignKey("WorkoutProgramId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Exercise");
-
-                    b.Navigation("WorkoutProgram");
-                });
-
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.AspNetRole", b =>
                 {
                     b.Navigation("AspNetRoleClaims");
@@ -1394,8 +1344,6 @@ namespace PT_Management_System_V2.Migrations
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Exercise", b =>
                 {
                     b.Navigation("WorkoutExercises");
-
-                    b.Navigation("WorkoutProgramExercises");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Image", b =>
@@ -1433,8 +1381,6 @@ namespace PT_Management_System_V2.Migrations
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutProgram", b =>
                 {
                     b.Navigation("Clients");
-
-                    b.Navigation("WorkoutProgramExercises");
                 });
 #pragma warning restore 612, 618
         }

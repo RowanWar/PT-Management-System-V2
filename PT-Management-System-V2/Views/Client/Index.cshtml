@@ -1,11 +1,11 @@
-﻿<!-- Expects a list of type ClientModel-->
-@model IEnumerable<PT_Management_System_V2.Models.ClientModel>
-
+﻿@model IEnumerable<PT_Management_System_V2.Data.ViewModels.ClientCoach_Client_ViewModel>
+<link rel="stylesheet" href="~/css/client_index.css" />
     <p>
         <a asp-action"Create">Your active clients</a>
     </p>
 
-    <table class="table">
+<div class="container my-5">
+    <h2>Your Active Clients</h2>
 
     <div class="row">
         @foreach (var client in Model)
@@ -21,29 +21,21 @@
                         <p class="extra-details hidden-by-default card-text"><strong>Start Date:</strong> @client.ClientStartDate.ToString("MM/dd/yyyy")</p>
                         <p class="extra-details hidden-by-default card-text"><strong>Monthly Charge:</strong> @client.MonthlyCharge.ToString("C")</p>
 
-        <tbody>
-            @foreach (var item in Model)
-                {
-                    <tr>
-                        <td>
-                            @* The user_id of the client, NOT the client_id *@
-                            @Html.DisplayFor(modelItem => item.ClientUserId)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ClientUsername)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ClientFirstName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ClientLastName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ClientEmail)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ClientPhone)
-                        </td>
+                        <div class="mt-3">
+                            <h6>Contact Details</h6>
+                            <p><strong>Email:</strong> @client.Email</p>
+                            <p><strong>Phone:</strong> @client.PhoneNumber</p>
+                            <p class="extra-details hidden-by-default"><strong>Contact by Email:</strong> @(client.ContactByEmail ?? false ? "Yes" : "No")</p>
+                            <p class="extra-details hidden-by-default"><strong>Contact by Phone:</strong> @(client.ContactByPhone ?? false ? "Yes" : "No")</p>
+                        </div>
+
+                        
+
+                        <div class="extra-details hidden-by-default mt-3">
+                            <h6>Referral Details</h6>
+                            <p><strong>Referred:</strong> @(client.Referred ?? false ? "Yes" : "No")</p>
+                            <p><strong>Referral:</strong> @client.Referral</p>
+                        </div> 
 
                         <!-- Action Links -->
                         <div class="d-flex justify-content-between mt-3">
