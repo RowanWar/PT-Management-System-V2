@@ -36,15 +36,24 @@
 
             <div class="col-md-12">
                 <div class="card-body">
+                    <h3 class="card-title">Upcoming Check In</h3>
+                        <div id="upcomingCheckInContainer">
+                            <!-- Check-ins are inserted here dynamically via JS -->
+                        </div>
+
                     <h3 class="card-title">Recent Check Ins </h3>
-                    
-                    <p> Filler</p>
-                    <p> Filler</p>
+                        <div id="checkInsContainer">
+                            <!-- Check-ins are inserted here dynamically via JS -->
+                        </div>
+                        <button id="loadMoreBtn" onclick="loadMoreCheckIns()">Load More...</button>
                 </div>
             </div>
 
         </div>
     </div>
 </div>
+
+
+<script src="~/js/yourCoach_Index.js"></script>
 
 @* <script src="~/js/client_ClientReport.js"></script> *@

@@ -21,7 +21,7 @@ public class ReportDAO /*: IClientDataService*/
     }
 
 
-    public async Task<List<WeeklyReport?>> GetAllWeeklyReportsOfUser(int client_id)
+    public async Task<List<WeeklyReport?>> GetAllWeeklyReportsOfUser(int client_id, int page = 1, int pageSize = 4)
     {
         using var _context = _contextFactory.CreateDbContext();
 
@@ -30,6 +30,8 @@ public class ReportDAO /*: IClientDataService*/
          //join c in _context.Clients on cc.ClientId equals c.ClientId
          //join u in _context.AspNetUsers on c.UserId equals u.Id
          where wr.ClientId == client_id
+         // Fetches the most recent reports first to work with pagination
+         orderby wr.CheckInDate descending
          select new WeeklyReport
          {
              // Client details
@@ -38,7 +40,10 @@ public class ReportDAO /*: IClientDataService*/
              CheckInDate = wr.CheckInDate,
              CheckInWeight = wr.CheckInWeight,
              ClientId = wr.ClientId
-         }).ToListAsync();
+         })
+         .Skip((page - 1) * pageSize)
+         .Take(pageSize)
+         .ToListAsync();
 
 
         return reports;

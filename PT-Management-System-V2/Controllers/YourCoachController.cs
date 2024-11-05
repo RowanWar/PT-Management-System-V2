@@ -4,6 +4,7 @@ using PT_Management_System_V2.Data.EntityFrameworkModels;
 using PT_Management_System_V2.Data.ViewModels;
 using PT_Management_System_V2.Services;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace PT_Management_System_V2.Controllers
 {
@@ -43,7 +44,7 @@ namespace PT_Management_System_V2.Controllers
 
             return View("Index", yourCoach);
         }
-        public async Task<IActionResult> CoachCheckIns()
+        public async Task<IActionResult> CoachCheckIns(int page = 1, int pageSize = 4)
         {
             // Grab the logged in users ID from the user authorization session context
             var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -58,9 +59,12 @@ namespace PT_Management_System_V2.Controllers
             }
 
             // Calls the Check In code from the reportDAO with the users authenticated clientId from above. This is called in the Index View via a FETCH REQUEST.
-            List<WeeklyReport?> weeklyReport = await _reportDAO.GetAllWeeklyReportsOfUser(clientId);
+            List<WeeklyReport?> weeklyReports = await _reportDAO.GetAllWeeklyReportsOfUser(clientId, page, pageSize);
 
-            return View("CheckIns", weeklyReport);
+            //return View("CheckIns", weeklyReport);
+            //string jsonSerialized = JsonSerializer.Serialize(weeklyReports);
+            
+            return Json(weeklyReports);
         }
     }
 }

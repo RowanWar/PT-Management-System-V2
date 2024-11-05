@@ -32,7 +32,8 @@
 
   <ItemGroup>
     <Folder Include="UploadedImages\" />
-    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\userCheckInPictures\" />
+    <Folder Include="wwwroot\profilePictures\" />
   </ItemGroup>
 
   <ItemGroup>
