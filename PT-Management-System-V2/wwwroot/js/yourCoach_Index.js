@@ -1,31 +1,4 @@
-﻿
-
-
-
-//async function loadMoreCheckIns() {
-//    fetch('/YourCoach/CoachCheckIns?page=1&pageSize=4')
-//        .then(response => response.json())
-//        .then(data => {
-//            checkInContainer = document.querySelector(".checkInsContainer");
-
-//            data.forEach(checkIn => {
-//                const checkInElement = document.createElement('div');
-//                checkInElement.className = "check-in-item";
-
-//                checkInContainer.content('Hello');
-//                checkInContainer.appendChild(checkInElement);
-
-//            });
-//        })}
-
-//document.addEventListener("DOMContentLoaded", function () {
-//    loadMoreCheckIns();
-//});
-
-
-
-let currentPage = 1;
-const pageSize = 4;
+﻿let currentPage = 1;
 
 async function loadMoreCheckIns() {
     try {
