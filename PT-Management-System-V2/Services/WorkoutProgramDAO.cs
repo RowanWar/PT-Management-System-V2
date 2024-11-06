@@ -7,7 +7,7 @@ using PT_Management_System_V2.Models;
 
 namespace PT_Management_System_V2.Services;
 
-public class YourCoachDAO
+public class WorkoutProgramDAO
 {
 
     private readonly string _dbConnectionString;
@@ -15,31 +15,15 @@ public class YourCoachDAO
     private readonly IDbContextFactory<ApplicationDbContext> _contextFactory; 
 
 
-    public YourCoachDAO(IDbContextFactory<ApplicationDbContext> contextFactory)
+    public WorkoutProgramDAO(IDbContextFactory<ApplicationDbContext> contextFactory)
     {
         _contextFactory = contextFactory;
     }
 
 
-    public async Task<int> GetClientIdFromUserId(string contextUserId)
-    {
-        // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
-        using var _context = _contextFactory.CreateDbContext();
-
-        var ClientId = await (
-            from c in _context.Clients
-            where c.UserId == contextUserId
-            select c.ClientId)
-            .FirstOrDefaultAsync();
-
-
-        return ClientId;
-    }
-
-
 
     // Returns the result as to whether the currently logged in user has a (coach_id) from the coach table, if so, returns this id
-    public async Task<YourCoach_ViewModel?> DisplayCoach(string contextUserId)
+    public async Task<WorkoutProgram_ViewModel?> DisplayPrograms(string contextUserId)
     {
         // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
         using var _context = _contextFactory.CreateDbContext();
@@ -79,22 +63,5 @@ public class YourCoachDAO
 
         return data;
     }
-
-
-
-
-
-    //public async Task<bool> VerifyUserIsClientsCoach(string clientId, int coachId)
-    //{
-    //    using var _context = _contextFactory.CreateDbContext();
-
-    //    // Join with the coach_client table and check if the (coach_id) matches the (client_id) being queried
-    //    var isMatch = await _context.CoachClients
-    //        .AnyAsync(coacli => coacli.CoachId == coachId && coacli.ClientId == int.Parse(clientId));
-
-
-    //    return isMatch;
-    //}
-
 
 }
