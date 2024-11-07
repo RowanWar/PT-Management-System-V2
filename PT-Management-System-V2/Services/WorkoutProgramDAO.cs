@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Server.IISIntegration;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using PT_Management_System_V2.Data;
 using PT_Management_System_V2.Data.EntityFrameworkModels;
 using PT_Management_System_V2.Data.ViewModels;
 using PT_Management_System_V2.Models;
+using System.Drawing.Printing;
 
 namespace PT_Management_System_V2.Services;
 
@@ -22,44 +24,38 @@ public class WorkoutProgramDAO
 
 
 
-    // Returns the result as to whether the currently logged in user has a (coach_id) from the coach table, if so, returns this id
-    public async Task<WorkoutProgram_ViewModel?> DisplayPrograms(string contextUserId)
+    // Returns a list of workout programs, including programs the coach has created themselves.
+    public async Task<List<WorkoutProgram_ViewModel?>> DisplayPrograms(string contextUserId, int page = 1, int pageSize = 10)
     {
         // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
         using var _context = _contextFactory.CreateDbContext();
 
         var data = await (
-            from client in _context.Clients
-            join coach_client in _context.CoachClients on client.ClientId equals coach_client.ClientId
-            join coach in _context.Coaches on coach_client.CoachId equals coach.CoachId
-            join coach_user in _context.AspNetUsers on coach.UserId equals coach_user.Id
-            join client_user in _context.AspNetUsers on contextUserId equals client_user.Id
-            where client.UserId == contextUserId
-            select new YourCoach_ViewModel
+            from wp in _context.WorkoutPrograms
+            join wpe in _context.WorkoutProgramExercises on wp.WorkoutProgramId equals wpe.WorkoutProgramId
+            join e in _context.Exercises on wpe.ExerciseId equals e.ExerciseId
+            where wp.CreatedByUserId == contextUserId || wp.IsDefault == true
+            select new WorkoutProgram_ViewModel
             {
-                // AspNetUsers table for the Coach
-                CoachFirstName = coach_user.FirstName,
-                CoachLastName = coach_user.LastName,
-                CoachUserName = coach_user.UserName,
-                CoachEmail = coach_user.Email,
-                CoachPhoneNumber = coach_user.PhoneNumber,
+                    WorkoutProgramId = wp.WorkoutProgramId,
+                    ProgramName = wp.ProgramName,
+                    ProgramLength = wp.ProgramLength,
+                    WeeklyFrequency = wp.WeeklyFrequency,
+                    DifficultyLevel = wp.DifficultyLevel,
+                    ProgramDescription = wp.Description,
+                    ProgramType = wp.ProgramType,
+                    IsDefault = wp.IsDefault,
+                    StartDate = wp.StartDate,
+                    EndDate = wp.EndDate,
 
-                // Coach Model
-                CoachProfileDescription = coach.CoachProfileDescription,
-                CoachQualifications = coach.CoachQualifications,
-
-                // CoachClient details
-                MonthlyCharge = coach_client.MonthlyCharge,
-                StartDate = coach_client.ClientStartDate,
-                EndDate = coach_client.ClientEndDate,
-
-                // AspNetUsers details
-                ClientFirstName = client_user.FirstName,
-                ClientLastName = client_user.LastName,
-                ClientUserName = client_user.UserName,
-                ClientEmail = client_user.Email,
-                ClientPhoneNumber = client_user.PhoneNumber
-            }).FirstOrDefaultAsync();
+                    ExerciseId = e.ExerciseId,
+                    ExerciseName = e.ExerciseName,
+                    MuscleGroup = e.MuscleGroup,
+                    ExerciseDescription = e.Description
+            })
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
 
         return data;
     }

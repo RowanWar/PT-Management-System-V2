@@ -65,6 +65,9 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<WorkoutProgram> WorkoutPrograms { get; set; }
 
+    // This might not be needed, potentially can remove...
+    public virtual DbSet<WorkoutProgramExercise> WorkoutProgramExercises { get; set; }
+
 
     // Modelbuilder is for the purpose of Entity Framework Core to know the relationship and how to map entities to the database
     protected override void OnModelCreating(ModelBuilder modelBuilder)

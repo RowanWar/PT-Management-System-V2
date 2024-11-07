@@ -60,11 +60,11 @@ builder.Services.AddSingleton<YourCoachDAO>(provider =>
 });
 
 
-//builder.Services.AddSingleton<YourCoachDAO>(provider =>
-//{
-//    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
-//    return new YourCoachDAO(contextFactory);
-//});
+builder.Services.AddSingleton<WorkoutProgramDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new WorkoutProgramDAO(contextFactory);
+});
 
 // Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();

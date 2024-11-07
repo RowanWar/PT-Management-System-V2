@@ -42,9 +42,10 @@ public class WorkoutProgramController : Controller
         // Otherwise no valid coach exists and return an oops this doesnt exist status...?
 
 
-        WorkoutProgram_ViewModel? workoutPrograms = await _workoutProgramDAO.DisplayCoach(contextUserId);
+        List<WorkoutProgram_ViewModel?> workoutPrograms = await _workoutProgramDAO.DisplayPrograms(contextUserId);
 
-        return View("Index", yourCoach);
+        return Json(workoutPrograms);
+        //return View("Index", workoutPrograms);
     }
 
 }
