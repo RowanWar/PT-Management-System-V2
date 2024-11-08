@@ -1,1 +1,53 @@
 ﻿@model IEnumerable<PT_Management_System_V2.Data.ViewModels.WorkoutProgram_ViewModel>
+
+
+@foreach (var item in Model)
+{
+<div class="container my-5">
+    <div class="card shadow">
+
+            <div class="col-md-12">
+                <div class="card-body">
+                    <h3 class="card-title">@Html.DisplayFor(modelItem => item.ProgramName)</h3>
+                        <div id="programContainer">
+                            <p>Program ID: @Html.DisplayFor(modelItem => item.WorkoutProgramId)</p>
+                            <p>Program Type: @Html.DisplayFor(modelItem => item.ProgramType)</p>
+                            <p>Program Description: @Html.DisplayFor(modelItem => item.ProgramDescription)</p>
+                            <p>Program Length: @Html.DisplayFor(modelItem => item.ProgramLength)</p>
+                            <p>Weekly Frequency: @Html.DisplayFor(modelItem => item.WeeklyFrequency)</p>
+                            <p>Default Program: @Html.DisplayFor(modelItem => item.IsDefault)</p>
+                        </div>
+
+                        <br />
+                    
+                        @* Exercises are created as a separate list within the query on the backend, so these must be unpacked individually *@
+                        <h3 class="card-title">Exercises </h3>
+                        <div class="exercisesContainer">
+                        @foreach (var exercise in item.Exercises)
+                        {
+                            <div class="exercise-item p-3">
+                                <p><strong>Exercise Name:</strong> @exercise.ExerciseName | @exercise.MuscleGroup</p>
+                                <p><strong>Description:</strong> @exercise.ExerciseDescription</p>
+                                @* <p><strong>Muscle Group:</strong> @exercise.MuscleGroup</p> *@
+                            </div>
+                            <hr />
+                        }
+                        </div>
+
+                </div>
+            </div>
+
+    </div>
+</div>
+}
+
+<style>
+    /* Applies to every even exercise item */
+    .exercisesContainer > .exercise-item:nth-child(even) {
+        background-color: orangered; /* Light grey background */
+    }
+    /* Optional styling for odd items */
+    .exercisesContainer > .exercise-item:nth-child(odd) {
+        background-color: cornflowerblue; /* White background */
+    }
+</style>

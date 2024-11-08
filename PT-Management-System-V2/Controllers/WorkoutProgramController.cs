@@ -44,8 +44,8 @@ public class WorkoutProgramController : Controller
 
         List<WorkoutProgram_ViewModel?> workoutPrograms = await _workoutProgramDAO.DisplayPrograms(contextUserId);
 
-        return Json(workoutPrograms);
-        //return View("Index", workoutPrograms);
+        //return Json(workoutPrograms);
+        return View("Index", workoutPrograms);
     }
 
 }

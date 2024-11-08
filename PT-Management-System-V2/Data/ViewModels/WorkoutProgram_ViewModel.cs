@@ -28,14 +28,14 @@ public class WorkoutProgram_ViewModel
 
     public DateTime? EndDate { get; set; }
 
+    public List<Exercise_ViewModel> Exercises { get; set; }
 
+}
 
-    // Exercise Model
+public class Exercise_ViewModel
+{
     public int ExerciseId { get; set; }
-
-    public string ExerciseName { get; set; } = null!;
-
-    public string MuscleGroup { get; set; } = null!;
-
-    public string? ExerciseDescription { get; set; }
+    public string ExerciseName { get; set; }
+    public string MuscleGroup { get; set; }
+    public string ExerciseDescription { get; set; }
 }
