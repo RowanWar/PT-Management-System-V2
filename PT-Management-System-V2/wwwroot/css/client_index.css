@@ -1,3 +1,36 @@
 ﻿.hidden-by-default {
     display: none;
+    transition: opacity 1s, display 1s;
+    opacity: 0;
 }
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+.client-modal {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 10;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.client-modal .modal-content {
+    padding: 0em;
+    width: 90%;
+}
+
+/*.client-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}*/

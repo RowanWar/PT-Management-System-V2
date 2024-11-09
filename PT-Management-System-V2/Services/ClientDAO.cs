@@ -82,7 +82,9 @@ public class ClientDAO : IClientDataService
         var clients = await
         (from cc in _context.CoachClients
          join c in _context.Clients on cc.ClientId equals c.ClientId
-         join u in _context.AspNetUsers on c.UserId equals u.Id // Was WorkoutUserId
+         join wp in _context.WorkoutPrograms on c.WorkoutProgramId equals wp.WorkoutProgramId
+         join u in _context.AspNetUsers on c.UserId equals u.Id
+
          where cc.CoachId == contextCoachId
          select new ClientCoach_Client_ViewModel
          {
@@ -92,6 +94,10 @@ public class ClientDAO : IClientDataService
              ContactByEmail = c.ContactByEmail, 
              Referred = c.Referred,
              Referral = c.Referral,
+             //WorkoutProgramId = c.WorkoutProgramId,
+
+             // WorkoutProgram details
+             WorkoutProgramName = wp.ProgramName,
 
              // CoachClient details
              MonthlyCharge = cc.MonthlyCharge,

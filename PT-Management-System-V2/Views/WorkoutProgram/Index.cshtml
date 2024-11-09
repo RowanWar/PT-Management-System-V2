@@ -1,5 +1,5 @@
 ﻿@model IEnumerable<PT_Management_System_V2.Data.ViewModels.WorkoutProgram_ViewModel>
-
+<link rel="stylesheet" href="~/css/workoutProgram_Index.css" />
 
 @foreach (var item in Model)
 {
@@ -40,14 +40,3 @@
     </div>
 </div>
 }
-
-<style>
-    /* Applies to every even exercise item */
-    .exercisesContainer > .exercise-item:nth-child(even) {
-        background-color: orangered; /* Light grey background */
-    }
-    /* Optional styling for odd items */
-    .exercisesContainer > .exercise-item:nth-child(odd) {
-        background-color: cornflowerblue; /* White background */
-    }
-</style>

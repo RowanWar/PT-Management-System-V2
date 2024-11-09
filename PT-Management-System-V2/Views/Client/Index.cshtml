@@ -5,7 +5,6 @@
     </p>
 
 <div class="container my-5">
-    <h2>Your Active Clients</h2>
 
     <div class="row">
         @foreach (var client in Model)
@@ -13,13 +12,16 @@
             <div class="client-container col-md-6 col-lg-4 mb-4">
                 <div class="card shadow-sm">
                     <!-- Client Image - Placeholder if not available -->
+                    @* <button src="icons/gear.svg" /> *@
                     <img src="https://via.placeholder.com/150" class="card-img-top" alt="Client Image" style="height: 200px; object-fit: cover;">
 
                     <!-- Card Body with Client Information -->
-                    <div class="client-body card-body">
+                    <div class="client-body card-body" data-client-id="@client.ClientId">
                         <h5 class="card-title">@client.FirstName @client.LastName</h5>
-                        <p class="extra-details hidden-by-default card-text"><strong>Start Date:</strong> @client.ClientStartDate.ToString("MM/dd/yyyy")</p>
+                        <p class="extra-details hidden-by-default"><strong>Program:</strong> @client.WorkoutProgramName </p>
+                        <p class="extra-details hidden-by-default card-text"><strong>Client Join Date:</strong> @client.ClientStartDate.ToString("MM/dd/yyyy")</p>
                         <p class="extra-details hidden-by-default card-text"><strong>Monthly Charge:</strong> @client.MonthlyCharge.ToString("C")</p>
+
 
                         <div class="mt-3">
                             <h6>Contact Details</h6>
@@ -28,8 +30,7 @@
                             <p class="extra-details hidden-by-default"><strong>Contact by Email:</strong> @(client.ContactByEmail ?? false ? "Yes" : "No")</p>
                             <p class="extra-details hidden-by-default"><strong>Contact by Phone:</strong> @(client.ContactByPhone ?? false ? "Yes" : "No")</p>
                         </div>
-
-                        
+                   
 
                         <div class="extra-details hidden-by-default mt-3">
                             <h6>Referral Details</h6>
@@ -41,13 +42,38 @@
                         <div class="d-flex justify-content-between mt-3">
                             @Html.ActionLink("View Check-ins", "WeeklyReport", new { client.ClientId, client.FirstName, client.LastName }, new { @class = "btn btn-primary btn-sm" })
                             @Html.ActionLink("View Workouts", "ClientWorkouts", new { client.ClientId }, new { @class = "btn btn-secondary btn-sm" })
-                            <button class="btn btn-primary" onclick="toggleDetails(this)"> More Details</button>
                         </div>
+
+
+                        <div class="client-modal" id="clientModal-@client.ClientId" style="display: none;">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Client Details</h5>
+                                    <button type="button" class="close" onclick="closeModal(this)">×</button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Details for Client ID: @client.ClientId</p>
+                                    <p>Email: @client.Email</p>
+                                    <p>Phone: @client.PhoneNumber</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" onclick="closeModal(this)">Close</button>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
+                </div>
+
+                <div class="d-grid">
+                    <button class="btn btn-primary btn-lg btn-block" onclick="toggleDetails(this)"> More Details</button>
                 </div>
             </div>
         }
     </div>
 </div>
+
+
+
 
 <script src="~/js/client_index.js"></script>

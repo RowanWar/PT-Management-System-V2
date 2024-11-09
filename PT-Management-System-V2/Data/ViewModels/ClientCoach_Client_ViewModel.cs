@@ -40,5 +40,9 @@ namespace PT_Management_System_V2.Data.ViewModels
         public string? Email { get; set; }
 
         public string? PhoneNumber { get; set; }
+
+
+        // WorkoutProgram Model
+        public string? WorkoutProgramName { get; set; }
     }
 }

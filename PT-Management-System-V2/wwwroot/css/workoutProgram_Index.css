@@ -1,0 +1,8 @@
+﻿/* Even exercise item (row) within a workout program */
+.exercisesContainer > .exercise-item:nth-child(even) {
+    background-color: orangered; /* Light grey background */
+}
+/* Uneven exercise item (row) within a workout program */
+.exercisesContainer > .exercise-item:nth-child(odd) {
+    background-color: cornflowerblue; /* White background */
+}
