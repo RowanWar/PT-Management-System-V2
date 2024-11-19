@@ -33,4 +33,6 @@ public partial class WorkoutProgram
     public ICollection<Client> Clients { get; set; }
 
     public ICollection<WorkoutProgramExercise> WorkoutProgramExercises { get; set; }
+
+    public ICollection<WorkoutProgramSchedule> WorkoutSchedules { get; set; }
 }

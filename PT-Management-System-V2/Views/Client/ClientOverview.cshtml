@@ -1,4 +1,85 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model PT_Management_System_V2.Data.ViewModels.ClientCoach_Client_ViewModel
+<link rel="stylesheet" href="~/css/client_ClientOverview.css" />
+
+@* CDN for 'Frontend Calendar' *@
+@* <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.0/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.0.0/main.min.js"></script> *@
+<script src="~/lib/fullcalendar-6.1.15/dist/index.global.min.js"></script>
+
+
+<div class="container my-5">
+
+    <div class="row">
+            <div class="client-container col-md-12 col-lg-8 mb-4">
+
+                <div class="card shadow-sm">
+                    <!-- Client Image -->
+                    @* <button src="icons/gear.svg" /> *@
+                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="Client Image" style="height: 200px; object-fit: cover;">
+
+                    <!-- Card Body with Client Information -->
+                        <div class="client-body card-body">
+                            <div class="calendar card-body">
+                                <h3 class="card-title">@Model.WorkoutProgramName</h3>
+                                <label>Dropdown</label>
+
+                            <form id="programForm" method="post" action="/workoutprogram/UpdateClientsWorkoutProgram">
+                                <div class="form-group">
+                                        <label for="programDropdown">Select a Program</label>
+                                        @* <button id="loadProgramsButton" class="btn btn-secondary">Load Programs</button> *@
+                                        <select name="workoutProgramId" id="programDropdown" class="loadProgramsButton form-control">
+                                            <option value="Default">@Model.WorkoutProgramName</option>
+                                        </select>
+                                        <input type="hidden" id="clientId" name="clientId" value="@Model.ClientId"/>
+                                    </div>
+
+                                <div id="buttonContainer" style="display: none; text-align: right; margin-top: 10px;">
+                                    <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+                                    <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
+                                </div>
+
+                                @* </div> *@
+                            </form>
+                        <div id="calendar"></div>
+
+                        @* Pre-generates the element for notification pop-up messages *@
+                        <div id="notification" class="hidden"></div>
+
+
+
+                            <h5 class="card-title">@Model.FirstName @Model.LastName</h5>
+                            <p class="extra-details hidden-by-default"><strong>Program:</strong> @Model.WorkoutProgramName </p>
+                            <p class="extra-details hidden-by-default card-text"><strong>Client Join Date:</strong> @Model.ClientStartDate.ToString("MM/dd/yyyy")</p>
+                            <p class="extra-details hidden-by-default card-text"><strong>Monthly Charge:</strong> @Model.MonthlyCharge.ToString("C")</p>
+
+
+                            <div class="mt-3">
+                                <h6>Contact Details</h6>
+                                <p><strong>Email:</strong> @Model.Email</p>
+                                <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+                                <p class="extra-details hidden-by-default"><strong>Contact by Email:</strong> @(Model.ContactByEmail ?? false ? "Yes" : "No")</p>
+                                <p class="extra-details hidden-by-default"><strong>Contact by Phone:</strong> @(Model.ContactByPhone ?? false ? "Yes" : "No")</p>
+                            </div>
+
+
+                            <div class="extra-details hidden-by-default mt-3">
+                                <h6>Referral Details</h6>
+                                <p><strong>Referred:</strong> @(Model.Referred ?? false ? "Yes" : "No")</p>
+                                <p><strong>Referral:</strong> @Model.Referral</p>
+                            </div>
+
+                            <!-- Action Links -->
+                            <div class="d-flex justify-content-between mt-3">
+                                @Html.ActionLink("View Check-ins", "WeeklyReport", new { Model.ClientId, Model.FirstName, Model.LastName }, new { @class = "btn btn-primary btn-sm" })
+                                @Html.ActionLink("View Workouts", "ClientWorkouts", new { Model.ClientId }, new { @class = "btn btn-secondary btn-sm" })
+                            </div>
+                         </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+
+
+
+<script src="~/js/client_ClientOverview.js"></script>

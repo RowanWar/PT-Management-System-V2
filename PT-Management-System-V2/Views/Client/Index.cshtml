@@ -48,13 +48,11 @@
                         <div class="client-modal" id="clientModal-@client.ClientId" style="display: none;">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title">Client Details</h5>
+                                    <h5 class="modal-title"> @client.FirstName @client.LastName </h5>
                                     <button type="button" class="close" onclick="closeModal(this)">×</button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Details for Client ID: @client.ClientId</p>
-                                    <p>Email: @client.Email</p>
-                                    <p>Phone: @client.PhoneNumber</p>
+                                    @Html.ActionLink("Client Page", "ClientOverview", new { client.ClientId}, new { @class = "btn btn-primary btn-lg"})
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" onclick="closeModal(this)">Close</button>

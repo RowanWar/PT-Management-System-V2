@@ -65,9 +65,11 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<WorkoutProgram> WorkoutPrograms { get; set; }
 
-    // This might not be needed, potentially can remove...
     public virtual DbSet<WorkoutProgramExercise> WorkoutProgramExercises { get; set; }
 
+    public virtual DbSet<WorkoutProgramSchedule> GetWorkoutProgramSchedules { get; set; }
+
+    public virtual DbSet<MuscleGroup> MuscleGroups { get; set; }
 
     // Modelbuilder is for the purpose of Entity Framework Core to know the relationship and how to map entities to the database
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -156,53 +158,6 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         // End of Identity
 
 
-        //modelBuilder.Entity<Client>()
-        //    .HasOne(c => c.WorkoutProgram)
-        //    .WithMany(wp => wp.Clients)
-        //    .HasForeignKey(c => c.WorkoutProgramId)
-        //    // If a program is deleted, set client's WorkoutProgramId to null
-        //    .OnDelete(DeleteBehavior.SetNull); 
-
-
-
-        //modelBuilder.Entity<Client>(entity =>
-        //{
-        //    entity.ToTable("client");
-
-        //    entity.HasKey(e => e.ClientId)
-        //          .HasName("client_pkey");
-
-        //    entity.Property(e => e.ClientId)
-        //          .HasColumnName("client_id");
-
-        //    entity.Property(e => e.UserId)
-        //          .IsRequired()
-        //          .HasColumnName("UserId");
-
-        //    entity.Property(e => e.ApplicationUserId)
-        //          .HasColumnName("ApplicationUserId");
-
-        //    // Foreign Key relationship with AspNetUsers (UserId)
-        //    entity.HasOne(d => d.User)
-        //          .WithMany() // No navigation property on AspNetUsers
-        //          .HasForeignKey(d => d.UserId)
-        //          .OnDelete(DeleteBehavior.Cascade)
-        //          .HasConstraintName("FK_client_AspNetUsers_UserId");
-
-        //    // Foreign Key relationship with AspNetUsers (ApplicationUserId)
-        //    entity.HasOne(d => d.User)
-        //          .WithMany() // No navigation property on AspNetUsers
-        //          .HasForeignKey(d => d.ApplicationUserId)
-        //          .HasConstraintName("FK_client_AspNetUsers_ApplicationUserId");
-
-        //    entity.HasIndex(e => e.UserId)
-        //          .HasDatabaseName("IX_client_UserId");
-
-        //    entity.HasIndex(e => e.ApplicationUserId)
-        //          .HasDatabaseName("IX_client_ApplicationUserId");
-        //});
-
-
         modelBuilder.Entity<Client>(entity =>
         {
             entity.ToTable("client");
@@ -247,7 +202,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .HasDatabaseName("IX_client_ApplicationUserId");
         });
 
-        // Configuration for WorkoutProgram entity
+
         modelBuilder.Entity<WorkoutProgram>(entity =>
         {
             entity.Property(wp => wp.IsDefault)
@@ -264,7 +219,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .HasConstraintName("FK_WorkoutProgram_AspNetUsers_CreatedByUserId");
         });
 
-        // Fixes the many-to-many relationship between Exercise and WorkoutProgram
+
         modelBuilder.Entity<WorkoutProgramExercise>()
             .HasKey(wpe => new { wpe.WorkoutProgramId, wpe.ExerciseId });
 
@@ -278,6 +233,13 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasOne(wpe => wpe.Exercise)
             .WithMany(e => e.WorkoutProgramExercises)
             .HasForeignKey(wpe => wpe.ExerciseId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+
+        modelBuilder.Entity<WorkoutProgramSchedule>()
+            .HasOne(ws => ws.WorkoutProgram)
+            .WithMany(wp => wp.WorkoutSchedules)
+            .HasForeignKey(ws => ws.WorkoutProgramId)
             .OnDelete(DeleteBehavior.Cascade);
 
 
@@ -398,10 +360,30 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasMaxLength(100)
                 .HasColumnName("exercise_name");
             entity.Property(e => e.IsDefault).HasColumnName("is_default");
-            entity.Property(e => e.MuscleGroup)
-                .HasMaxLength(100)
-                .HasColumnName("muscle_group");
+
             entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(e => e.ExerciseMuscleGroup)
+              .WithMany(mg => mg.Exercises)
+              .HasForeignKey(e => e.MuscleGroupId)
+              .OnDelete(DeleteBehavior.Restrict)
+              .HasConstraintName("FK_Exercise_MuscleGroup");
+        });
+
+        modelBuilder.Entity<MuscleGroup>(entity =>
+        {
+            entity.ToTable("MuscleGroup");
+
+            entity.HasKey(mg => mg.MuscleGroupId)
+                  .HasName("MuscleGroup_pkey");
+
+            entity.Property(mg => mg.MuscleGroupId)
+                  .HasColumnName("MuscleGroupId");
+
+            entity.Property(mg => mg.MuscleGroupName)
+                  .IsRequired()
+                  .HasMaxLength(50)
+                  .HasColumnName("MuscleGroupName");
         });
 
         modelBuilder.Entity<HealthCondition>(entity =>

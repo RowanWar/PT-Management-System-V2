@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PT_Management_System_V2.Data;
@@ -11,9 +12,11 @@ using PT_Management_System_V2.Data;
 namespace PT_Management_System_V2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241113043953_AddWorkoutProgramSchedule")]
+    partial class AddWorkoutProgramSchedule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -627,10 +630,9 @@ namespace PT_Management_System_V2.Migrations
 
                     b.Property<string>("MuscleGroup")
                         .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("MuscleGroupId")
-                        .HasColumnType("integer");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("muscle_group");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("integer")
@@ -638,8 +640,6 @@ namespace PT_Management_System_V2.Migrations
 
                     b.HasKey("ExerciseId")
                         .HasName("exercise_pkey");
-
-                    b.HasIndex("MuscleGroupId");
 
                     b.HasIndex(new[] { "ExerciseName" }, "exercise_exercise_name_key")
                         .IsUnique();
@@ -714,27 +714,6 @@ namespace PT_Management_System_V2.Migrations
                         .HasName("image_pkey");
 
                     b.ToTable("image", (string)null);
-                });
-
-            modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.MuscleGroup", b =>
-                {
-                    b.Property<int>("MuscleGroupId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("MuscleGroupId");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MuscleGroupId"));
-
-                    b.Property<string>("MuscleGroupName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("MuscleGroupName");
-
-                    b.HasKey("MuscleGroupId")
-                        .HasName("MuscleGroup_pkey");
-
-                    b.ToTable("MuscleGroup", (string)null);
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Set", b =>
@@ -1289,18 +1268,6 @@ namespace PT_Management_System_V2.Migrations
                     b.Navigation("Coach");
                 });
 
-            modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Exercise", b =>
-                {
-                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.MuscleGroup", "ExerciseMuscleGroup")
-                        .WithMany("Exercises")
-                        .HasForeignKey("MuscleGroupId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("FK_Exercise_MuscleGroup");
-
-                    b.Navigation("ExerciseMuscleGroup");
-                });
-
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.HealthConditionClient", b =>
                 {
                     b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.Client", "Client")
@@ -1474,11 +1441,6 @@ namespace PT_Management_System_V2.Migrations
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.Image", b =>
                 {
                     b.Navigation("WeeklyReportImages");
-                });
-
-            modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.MuscleGroup", b =>
-                {
-                    b.Navigation("Exercises");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.SetCategory", b =>
