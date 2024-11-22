@@ -28,7 +28,7 @@
                                         <label for="programDropdown">Select a Program</label>
                                         @* <button id="loadProgramsButton" class="btn btn-secondary">Load Programs</button> *@
                                         <select name="workoutProgramId" id="programDropdown" class="loadProgramsButton form-control">
-                                            <option value="Default">@Model.WorkoutProgramName</option>
+                                            <option value="@Model.WorkoutProgramId">@Model.WorkoutProgramName</option>
                                         </select>
                                         <input type="hidden" id="clientId" name="clientId" value="@Model.ClientId"/>
                                     </div>
@@ -37,9 +37,8 @@
                                     <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
                                     <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
                                 </div>
-
-                                @* </div> *@
                             </form>
+
                         <div id="calendar"></div>
 
                         @* Pre-generates the element for notification pop-up messages *@

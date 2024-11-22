@@ -56,20 +56,25 @@ namespace PT_Management_System_V2.Controllers
 
 
         [HttpGet]
-        public IActionResult GetDaysOfWeek(/*int workoutProgramId*/)
+        public async Task<IActionResult> GetDaysOfWeek([FromQuery] int workoutProgramId)
         {
-            var daysOfWeek = _context.GetWorkoutProgramSchedules
-                .Where(wpi => wpi.WorkoutProgramId == 1 /*workoutProgramId*/)
-                .Select(wpi => new
+
+            var daysOfWeek = await(
+                from wps in _context.WorkoutProgramSchedules
+                where wps.WorkoutProgramId == workoutProgramId
+                join mg in _context.MuscleGroups on wps.MuscleGroupId equals mg.MuscleGroupId
+                select new
                 {
-                    id = wpi.WorkoutScheduleId,
-                    //WorkoutProgramId = wpi.WorkoutProgramId,
-                    daysOfWeek = "[" + wpi.DayOfWeek + "]",
-                    title = wpi.MuscleGroup
-                }).ToList();
+                    id = wps.WorkoutScheduleId, // Might need to be workoutScheduleId
+                    daysOfWeek = "[" + wps.DayOfWeek + "]",
+                    title = mg.MuscleGroupName
+                }).ToListAsync();
+
 
             return Json(daysOfWeek);
         }
+
+
 
         // Responsible for updating in db if workout is dragged to a new day
         [HttpPost]
@@ -86,7 +91,7 @@ namespace PT_Management_System_V2.Controllers
 
 
             // Finds the row containing the day of the week via the PK in WorkoutProgramSchedule table 
-            var muscleGroupDay = _context.GetWorkoutProgramSchedules.Find(workoutScheduleId);
+            var muscleGroupDay = _context.WorkoutProgramSchedules.Find(workoutScheduleId);
             if (muscleGroupDay != null)
             {
                 muscleGroupDay.DayOfWeek = dayOfWeek;

@@ -138,6 +138,7 @@ public class ClientDAO /*: IClientDataService*/
             //WorkoutProgramId = c.WorkoutProgramId,
 
             // WorkoutProgram details
+            WorkoutProgramId = wp.WorkoutProgramId,
             WorkoutProgramName = wp.ProgramName,
 
             // CoachClient details

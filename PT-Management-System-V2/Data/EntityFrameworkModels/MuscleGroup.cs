@@ -15,4 +15,6 @@ public partial class MuscleGroup
 
 
     public ICollection<Exercise> Exercises { get; set; }
+
+    public ICollection<WorkoutProgramSchedule> WorkoutProgramSchedules { get; set; }
 }

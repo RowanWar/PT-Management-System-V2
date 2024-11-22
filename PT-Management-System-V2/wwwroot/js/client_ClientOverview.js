@@ -5,7 +5,6 @@
         muscleGroup: muscleGroup
     };
 
-    //console.log(payload)
 
     // Send the data to the controller
     fetch('/Calendar/UpdateWorkoutProgram', {
@@ -29,15 +28,78 @@
         });
 };
 
+// Updates the full calendar displayed for daysOfWeek based on the new workout program selected by the coach
+function updateCalendar(newWorkoutProgramId, calendar) {
+    calendar.removeAllEvents();
 
+    // Add the new array of days of week from the new program
+    fetch("/Calendar/GetDaysOfWeek?workoutProgramId=" + newWorkoutProgramId)
+        .then(response => response.json())
+        .then(dayOfWeek => {
+            calendar.addEventSource(dayOfWeek);
+        })
+        .catch(error => {
+            console.error("Error fetching updated events: ", error);
+        });
+}
+
+
+function handleSubmitButtonPostReq(event, calendar) {
+    event.preventDefault(); // Stop the form from redirecting
+    const form = document.querySelector("#programForm");
+    const formData = new FormData(form); // Collect the form data
+    const payload = {
+        workoutProgramId: Number(formData.get('workoutProgramId')),
+        clientId: Number(formData.get('clientId'))
+    };
+
+    console.log(payload);
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to update the workout program.");
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Workout program updated successfully:", data);
+            showNotification("Workout program updated!", true);
+            // This function refreshes the days of the week within the calendar based on new programs id
+            updateCalendar(payload.workoutProgramId, calendar);
+            buttonContainer.style.display = "none";
+        })
+        .catch(error => {
+            console.error("Error updating workout program:", error);
+            showNotification("Error updating workout program!", false);
+        });
+    
+            
+};
 
 document.addEventListener('DOMContentLoaded', function () {
+
+    // Interrupts the submit btn on the form to prevent redirect and handle updating workout programs via AJAX
+    document.querySelector('#programForm').addEventListener('submit', function (event) {
+        handleSubmitButtonPostReq(event, calendar);
+    });
+
 
     const submitButton = document.querySelector("#submitButton");
     const cancelButton = document.querySelector("#cancelButton");
 
+    const dropdown = document.getElementById('programDropdown');
+    const originalValue = dropdown.textContent; // Store the original value for reset
+    console.log(originalValue);
 
-
+    // The clients current program id is assigned to the default placeholder value via @Model in the .cshtml on model > view page load.
+    let currentWorkoutProgramId = dropdown.value;
 
 
     // FullCalendar component
@@ -51,22 +113,23 @@ document.addEventListener('DOMContentLoaded', function () {
         dayHeaderFormat: { weekday: "long" },    // Removes the dates from the header so it only displays days of week i.e. mon, tue
         firstDay: 1,
         contentHeight: "auto",
-        events: "/Calendar/GetDaysOfWeek",
+        // Utilises the workoutProgramId passed in from the model and fetched by the data passed on page load via controller
+        events: "/Calendar/GetDaysOfWeek?workoutProgramId=" + currentWorkoutProgramId,
         editable: true,                           // Allow drag-and-drop for testing
         droppable: false,                          // Disable external dragging if unused
         displayEventTime: false,      // Hide time for events
         dateClick: null,              // Disable date click
 
+        
 
         eventDrop: function (info) {
+
             // Handle workout re-scheduling
             // Uses Prototype() to fetch the day of the week (dow) 
             let dayOfWeek = info.event.start.getDay();
             let muscleGroup = info.event.title;
             let workoutScheduleId = info.event.id;
 
-            //console.log(day);
-            console.log(workoutScheduleId, dayOfWeek, muscleGroup);
             updateWorkoutDate(workoutScheduleId, dayOfWeek, muscleGroup);
         }
     });
@@ -76,9 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    const dropdown = document.getElementById('programDropdown');
-    const originalValue = dropdown.textContent; // Store the original value for reset
-    console.log(originalValue);
+
 
     // Show buttons when a new program is selected
     dropdown.addEventListener("change", function () {
@@ -101,13 +162,13 @@ document.addEventListener('DOMContentLoaded', function () {
 function showNotification(message, isSuccess = true) {
     const notification = document.getElementById('notification');
 
-    // Set the message and apply the appropriate style
+    
     notification.textContent = message;
-    notification.className = isSuccess ? 'success show' : 'error show';
+    notification.className = isSuccess ? "success show" : "error show";
 
     // Automatically hide the notification after 3 seconds
     setTimeout(() => {
-        notification.className = 'hidden';
+        notification.className = "hidden";
     }, 2000);
 };
 
@@ -116,7 +177,7 @@ function showNotification(message, isSuccess = true) {
 
 // Using lazy-loading to minimise page-loading duration. Currently, this performs a query to the db every time the user clicks the dropdown btn. 
 // This should be moved to save query to SESSION STORAGE, and deleted after to save db trips
-document.querySelector(".loadProgramsButton").addEventListener("click", function () {
+document.querySelector(".loadProgramsButton").addEventListener("click", function (event) {
     event.preventDefault();
 
     programDropdown = document.querySelector("#programDropdown");

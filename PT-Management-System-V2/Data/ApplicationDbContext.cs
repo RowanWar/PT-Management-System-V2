@@ -67,7 +67,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     public virtual DbSet<WorkoutProgramExercise> WorkoutProgramExercises { get; set; }
 
-    public virtual DbSet<WorkoutProgramSchedule> GetWorkoutProgramSchedules { get; set; }
+    public virtual DbSet<WorkoutProgramSchedule> WorkoutProgramSchedules { get; set; }
 
     public virtual DbSet<MuscleGroup> MuscleGroups { get; set; }
 
@@ -179,7 +179,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasOne(c => c.WorkoutProgram)
                   .WithMany(wp => wp.Clients)
                   .HasForeignKey(c => c.WorkoutProgramId)
-                  .OnDelete(DeleteBehavior.SetNull); // Set WorkoutProgramId to null if the program is deleted
+                  .OnDelete(DeleteBehavior.SetNull);
 
             // Foreign Key relationship with AspNetUsers (UserId)
             entity.HasOne(d => d.User)
@@ -190,7 +190,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
             // Foreign Key relationship with AspNetUsers (ApplicationUserId)
             entity.HasOne(d => d.User)
-                  .WithMany() // No navigation property on AspNetUsers
+                  .WithMany() 
                   .HasForeignKey(d => d.ApplicationUserId)
                   .HasConstraintName("FK_client_AspNetUsers_ApplicationUserId");
 
@@ -236,11 +236,28 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .OnDelete(DeleteBehavior.Cascade);
 
 
-        modelBuilder.Entity<WorkoutProgramSchedule>()
-            .HasOne(ws => ws.WorkoutProgram)
-            .WithMany(wp => wp.WorkoutSchedules)
-            .HasForeignKey(ws => ws.WorkoutProgramId)
-            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<WorkoutProgramSchedule>(entity =>
+        {
+            entity.ToTable("WorkoutProgramSchedules");
+
+            entity.HasKey(ws => ws.WorkoutScheduleId)
+                .HasName("WorkoutSchedule_pkey");
+
+            entity.Property(ws => ws.WorkoutScheduleId)
+                .HasColumnName("WorkoutScheduleId");
+
+            entity.HasOne(ws => ws.MuscleGroup)
+                  .WithMany(mg => mg.WorkoutProgramSchedules) 
+                  .HasForeignKey(ws => ws.MuscleGroupId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(ws => ws.WorkoutProgram)
+                .WithMany(wp => wp.WorkoutSchedules)
+                .HasForeignKey(ws => ws.WorkoutProgramId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+        });
+
 
 
         modelBuilder.Entity<ClientMeasurement>(entity =>
@@ -384,6 +401,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                   .IsRequired()
                   .HasMaxLength(50)
                   .HasColumnName("MuscleGroupName");
+
         });
 
         modelBuilder.Entity<HealthCondition>(entity =>
@@ -580,29 +598,8 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasForeignKey(d => d.WorkoutUserId)
                 .HasConstraintName("FK_workout_UserId");
 
-
-            //entity.Property(e => e.WorkoutUserId)
-            //    .HasColumnName("UserId");
-            ////.IsRequired(true);
-
-            ////// Foreign Key relationship with AspNetUsers
-            ////entity.HasOne(d => d.AspNetUser)
-            ////      .WithMany(p => p.Workouts)
-            ////      .HasForeignKey(d => d.WkoutUserId)
-            ////      .OnDelete(DeleteBehavior.Cascade)
-            ////      .HasConstraintName("FK_workout_UserId");
-
-            //entity.HasOne(d => d.AspNetUser)
-            //    .WithMany(p => p.Workouts)
-            //    .HasPrincipalKey(u => u.Id)
-            //    .HasForeignKey(d => d.WorkoutUserId)
-            //    .HasConstraintName("FK_workout_UserId");
         });
 
-
-
-        string debugModel = modelBuilder.Model.ToDebugString();
-        Debug.WriteLine(debugModel);
 
         modelBuilder.Entity<WorkoutExercise>(entity =>
         {

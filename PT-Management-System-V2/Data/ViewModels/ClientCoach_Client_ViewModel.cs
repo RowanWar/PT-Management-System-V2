@@ -43,6 +43,7 @@ namespace PT_Management_System_V2.Data.ViewModels
 
 
         // WorkoutProgram Model
+        public int? WorkoutProgramId { get; set; }
         public string? WorkoutProgramName { get; set; }
     }
 }

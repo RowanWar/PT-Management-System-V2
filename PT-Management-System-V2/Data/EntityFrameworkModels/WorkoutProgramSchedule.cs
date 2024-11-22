@@ -13,13 +13,16 @@ public partial class WorkoutProgramSchedule
     public int WorkoutProgramId { get; set; }
 
     [Required]
-    [Range(1, 7, ErrorMessage = "Day of week must be between 1 (Monday) and 7 (Sunday)")]
-
-    public int DayOfWeek { get; set; }  
+    public int MuscleGroupId { get; set; }
 
     [Required]
-    [MaxLength(50)]
-    public string MuscleGroup { get; set; } = string.Empty;
+    [Range(1, 7, ErrorMessage = "Day of week must be between 1 (Monday) and 7 (Sunday)")]
+
+    public int DayOfWeek { get; set; }
+
+
+    [ForeignKey(nameof(MuscleGroupId))]
+    public MuscleGroup MuscleGroup { get; set; }
 
     [ForeignKey("WorkoutProgramId")]
     public WorkoutProgram WorkoutProgram { get; set; } 
