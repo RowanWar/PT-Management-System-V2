@@ -6,3 +6,68 @@
 .exercisesContainer > .exercise-item:nth-child(odd) {
     background-color: cornflowerblue; /* White background */
 }
+
+.hidden {
+    display: none;
+}
+
+.collapse {
+    display: none;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background-color: #fff; /* White background for clarity */
+}
+
+    .table th, .table td {
+        padding: 0.75rem 1rem; /* Add padding for space */
+        border: 1px solid #e0e0e0; /* Light border color */
+        text-align: left;
+    }
+
+    .table th {
+        background-color: #fffefc; /* Light gray header for contrast */
+        font-weight: bold;
+        border-radius: 5px;
+    }
+
+.table-striped tbody tr:nth-child(even) {
+    /*background-color: #ebcbb5;*/
+    background-color: #f5efeb;
+}
+.table-striped tbody tr:nth-child(odd) {
+    /*background-color: #ffbb8c;*/ /* Subtle striped effect */
+    background-color: #f7ece4;
+}
+
+.table tbody tr:hover {
+    background-color: #ebcbb5; /* Highlight row on hover */
+    cursor: pointer; /* Change cursor to indicate interactivity */
+}
+
+/*.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    border-radius: 100px;
+}
+
+    .table th {
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        text-align: left;
+        font-size: 1.1rem;
+        border-radius: 100px;
+    }
+    .table td {
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+.table-striped tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}*/

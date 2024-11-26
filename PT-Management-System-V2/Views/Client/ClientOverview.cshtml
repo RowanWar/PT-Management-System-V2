@@ -20,12 +20,11 @@
                     <!-- Card Body with Client Information -->
                         <div class="client-body card-body">
                             <div class="calendar card-body">
-                                <h3 class="card-title">@Model.WorkoutProgramName</h3>
-                                <label>Dropdown</label>
+                                @* <h3 class="card-title">@Model.WorkoutProgramName</h3> *@
 
                             <form id="programForm" method="post" action="/workoutprogram/UpdateClientsWorkoutProgram">
                                 <div class="form-group">
-                                        <label for="programDropdown">Select a Program</label>
+                                        <label for="programDropdown">Clients Program</label>
                                         @* <button id="loadProgramsButton" class="btn btn-secondary">Load Programs</button> *@
                                         <select name="workoutProgramId" id="programDropdown" class="loadProgramsButton form-control">
                                             <option value="@Model.WorkoutProgramId">@Model.WorkoutProgramName</option>
@@ -33,7 +32,7 @@
                                         <input type="hidden" id="clientId" name="clientId" value="@Model.ClientId"/>
                                     </div>
 
-                                <div id="buttonContainer" style="display: none; text-align: right; margin-top: 10px;">
+                                <div id="buttonContainer" style="display: none; text-align: right; margin-top: 10px; margin-bottom: 1em;">
                                     <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
                                     <button type="button" id="cancelButton" class="btn btn-secondary">Cancel</button>
                                 </div>

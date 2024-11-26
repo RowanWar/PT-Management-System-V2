@@ -71,6 +71,25 @@ public class WorkoutProgramController : Controller
         return Json(workoutPrograms);
     }
 
+    public async Task<IActionResult> ListWorkoutExercises([FromQuery] int workoutProgramId)
+    {
+        // Grab the logged in users ID from the user authorization session context
+        var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+
+
+
+        // If successful, do next thing
+
+        // Otherwise no valid coach exists and return an oops this doesnt exist status...?
+
+
+        List<Exercise_ViewModel?> programExercises = await _workoutProgramDAO.DisplayExercisesByProgramId(contextUserId, workoutProgramId);
+
+        return Json(programExercises);
+    }
+
 
 
     // Updates the workout program assigned to a coach's client 

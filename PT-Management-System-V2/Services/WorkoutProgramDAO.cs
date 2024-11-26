@@ -47,17 +47,17 @@ public class WorkoutProgramDAO
                 EndDate = wp.EndDate,
 
                 // Creates a separate list for exercises within a program which are iterated through on the Razor view. This reduces data redundancy and should help improve page load times.
-                Exercises = (
-                    from wpe in _context.WorkoutProgramExercises
-                    join e in _context.Exercises on wpe.ExerciseId equals e.ExerciseId
-                    where wpe.WorkoutProgramId == wp.WorkoutProgramId
-                    select new Exercise_ViewModel
-                    {
-                        ExerciseId = e.ExerciseId,
-                        ExerciseName = e.ExerciseName,
-                        MuscleGroup = e.MuscleGroup,
-                        ExerciseDescription = e.Description
-                    }).ToList()
+                //Exercises = (
+                //    from wpe in _context.WorkoutProgramExercises
+                //    join e in _context.Exercises on wpe.ExerciseId equals e.ExerciseId
+                //    where wpe.WorkoutProgramId == wp.WorkoutProgramId
+                //    select new Exercise_ViewModel
+                //    {
+                //        ExerciseId = e.ExerciseId,
+                //        ExerciseName = e.ExerciseName,
+                //        MuscleGroup = e.MuscleGroup,
+                //        ExerciseDescription = e.Description
+                //    }).ToList()
             })
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
@@ -65,6 +65,32 @@ public class WorkoutProgramDAO
 
         return data;
     }
+
+
+    // Used to lazy-load data individually based on which program has been focused/selected in the workoutprogram/index page
+    public async Task<List<Exercise_ViewModel?>> DisplayExercisesByProgramId(string contextUserId, int workoutProgramId)
+    {
+        // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
+        using var _context = _contextFactory.CreateDbContext();
+
+        var data = await (
+            from wp in _context.WorkoutPrograms
+            where wp.CreatedByUserId == contextUserId || wp.IsDefault == true
+            join wpe in _context.WorkoutProgramExercises on workoutProgramId equals wpe.WorkoutProgramId
+            join e in _context.Exercises on wpe.ExerciseId equals e.ExerciseId
+            where wpe.WorkoutProgramId == wp.WorkoutProgramId
+            select new Exercise_ViewModel
+            {   
+                ExerciseId = e.ExerciseId,
+                ExerciseName = e.ExerciseName,
+                MuscleGroup = e.MuscleGroup,
+                ExerciseDescription = e.Description
+            })
+            .ToListAsync();
+
+        return data;
+    }
+
 
 
     // Assigns a program workout schedule to a user  
