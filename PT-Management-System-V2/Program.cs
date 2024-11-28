@@ -32,32 +32,38 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 
 
 //builder.Services.AddSingleton<WorkoutDAO>(provider => new WorkoutDAO(connectionString));
-// Registers WorkoutDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
+
+
+// Registers as a singleton whilst using DI to safely manage the lifetime of ContextFactory
 builder.Services.AddSingleton<WorkoutDAO>(provider =>
 {
     var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
     return new WorkoutDAO(connectionString, contextFactory);
 });
 
-// Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
 builder.Services.AddSingleton<ClientDAO>(provider =>
     {
         var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
             return new ClientDAO(connectionString, contextFactory); 
     });
 
-// Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
 builder.Services.AddSingleton<ReportDAO>(provider =>
 {
     var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
     return new ReportDAO(contextFactory);
 });
 
-// Registers ClientDAO as a singleton whilst using DI to safely manage the lifetime of ContextFactory
 builder.Services.AddSingleton<YourCoachDAO>(provider =>
 {
     var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
     return new YourCoachDAO(contextFactory);
+});
+
+
+builder.Services.AddSingleton<WorkoutProgramDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new WorkoutProgramDAO(contextFactory);
 });
 
 // Service dedicated to handling the generation of JWT tokens after successful user login/authentication

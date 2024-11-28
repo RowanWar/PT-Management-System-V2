@@ -1,0 +1,49 @@
+﻿/* Notification style for the success/failure to update a program */
+#notification {
+    position: absolute; 
+    top: calc(100%); 
+    left: 50%; 
+    transform: translateX(-50%); 
+    background-color: rgba(0, 0, 0, 0.8); 
+    color: white; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    font-size: 1.1em; 
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); 
+    z-index: 1000; 
+    /* Defaults to hidden */
+    opacity: 0;
+    /* Prevent interactions when hidden */
+    pointer-events: none;
+    transition: opacity 0.5s ease-in-out;
+}
+
+    /* Success notification */
+    #notification.success {
+        background-color: rgba(46, 204, 113, 0.9);
+    }
+
+    /* Error notification */
+    #notification.error {
+        background-color: rgba(231, 76, 60, 0.9); 
+    }
+
+    /* Displays the notification on page */
+    #notification.show {
+        opacity: 1;
+        /* Allow interactions */
+        pointer-events: auto;
+    }
+
+.hidden {
+    display: none;
+}
+
+.calendar {
+    position: relative; 
+    margin-bottom: 3em; 
+}
+
+/*#buttonContainer {
+    margin-bottom: 1em;
+}*/

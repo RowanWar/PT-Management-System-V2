@@ -75,28 +75,13 @@ public class YourCoachDAO
                 ClientUserName = client_user.UserName,
                 ClientEmail = client_user.Email,
                 ClientPhoneNumber = client_user.PhoneNumber
+
+
             }).FirstOrDefaultAsync();
 
         return data;
     }
 
-
-    // Coach Model 
-    public string? CoachProfileDescription { get; set; }
-
-    public string? CoachQualifications { get; set; }
-
-
-    // Client Model
-    public string? ClientFirstName { get; set; }
-
-    public string? ClientLastName { get; set; }
-
-    public string? ClientUserName { get; set; }
-
-    public string? ClientEmail { get; set; }
-
-    public string? ClientPhoneNumber { get; set; }
 
 
 

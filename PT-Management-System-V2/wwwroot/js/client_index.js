@@ -1,20 +1,4 @@
-﻿//function toggleDetails(button) {
-//    button.classList.toggle('.hidden-by-default');
-//    //elements = document.querySelectorAll(.)
-//    //// Toggle visibility of the next sibling element (extra-details div)
-//    //const extraDetails = button.nextElementSibling;
-
-//    //if (extraDetails.style.display === "none") {
-//    //    extraDetails.style.display = "block";
-//    //    button.textContent = "Show Less Details";
-//    //} else {
-//    //    extraDetails.style.display = "none";
-//    //    button.textContent = "Show More Details";
-//    //}
-
-//}
-
-
+﻿
 function toggleDetails(button) {
     const clientContainer = button.closest(".client-container"); 
 
@@ -35,20 +19,30 @@ function toggleDetails(button) {
 
 }
 
-//document.addEventListener("DOMContentLoaded", function () {
 
-//    const clientBody = document.querySelectorAll(".client-body");
+// Adds an event listener to all client-bodies (clients) that have been generated dynamically on the page 
+document.addEventListener("DOMContentLoaded", function () {
+    const clientBodies = document.querySelectorAll(".client-body");
 
-//    const clientContainer = this.closest(".client-container"); 
-//    const extraDetailsElements = clientContainer.querySelectorAll(".extra-details");
+    clientBodies.forEach(clientBody => {
+        clientBody.addEventListener("click", function () {
+            // If another modal is already open when the user clicks onto a client, closes it.
+            document.querySelectorAll(".client-modal").forEach(modal => {
+                modal.style.display = "none";
+            });
 
+            // Display the modal within the client-body that has been clicked
+            const clientModal = this.querySelector(".client-modal");
+            clientModal.style.display = "block";
+        });
+    });
+});
 
-//    clientBody.forEach(elem => {
-//        elem.addEventListener("click", function (button) {
-//            // Toggles a class which sets display to none
-//            extraDetailsElements.forEach(elem => {
-//                elem.classList.toggle("hidden-by-default");
-//            });
-//        })
-//    })
-//});
+// Handles closing the modal
+function closeModal(button) {
+
+    event.stopPropagation();
+    // Grab the parent modal belonging to the clientBody (client)
+    let modalElement = button.closest(".client-modal");
+    modalElement.style.display = "none";
+}

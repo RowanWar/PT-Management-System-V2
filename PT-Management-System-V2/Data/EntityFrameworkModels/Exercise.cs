@@ -18,4 +18,11 @@ public partial class Exercise
     public int? UserId { get; set; }
 
     public virtual ICollection<WorkoutExercise> WorkoutExercises { get; set; } = new List<WorkoutExercise>();
+
+    public ICollection<WorkoutProgramExercise> WorkoutProgramExercises { get; set; }
+
+    // FK to MuscleGroup table
+    public int MuscleGroupId { get; set; }
+
+    public MuscleGroup ExerciseMuscleGroup { get; set; }
 }

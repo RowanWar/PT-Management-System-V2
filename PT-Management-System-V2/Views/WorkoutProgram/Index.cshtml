@@ -1,0 +1,63 @@
+﻿@model IEnumerable<PT_Management_System_V2.Data.ViewModels.WorkoutProgram_ViewModel>
+<link rel="stylesheet" href="~/css/workoutProgram_Index.css" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+<div class="search-container my-4">
+    <input type="text" id="searchBox" class="form-control" placeholder="Search for programs...">
+</div>
+
+@foreach (var item in Model)
+{
+<div class="container my-5">
+    <div class="card shadow">
+
+            <div class="col-md-12">
+                <div class="card-body" data-workout-program-id="@item.WorkoutProgramId">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <!-- Title Section (9/12) -->
+                            <div class="col-9">
+                                <h3 class="card-title">@Html.DisplayFor(modelItem => item.ProgramName)</h3>
+                            </div>
+
+                            <!-- Delete Button Section (3/12) -->
+                            <div class="col-3 text-end">
+                                <button class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* <h3 class="card-title">@Html.DisplayFor(modelItem => item.ProgramName)</h3> *@
+
+                        <div id="programContainer">
+                            @* <p>Program ID: @Html.DisplayFor(modelItem => item.WorkoutProgramId)</p> *@
+                            
+                            <p>Program Description: @Html.DisplayFor(modelItem => item.ProgramDescription)</p>
+                            <div class="expandable-details hidden">
+                                <p class="hidden">Program Type: @Html.DisplayFor(modelItem => item.ProgramType)</p>
+                                <p class="hidden">Program Length: @Html.DisplayFor(modelItem => item.ProgramLength)</p>
+                                <p>Weekly Frequency: @Html.DisplayFor(modelItem => item.WeeklyFrequency)</p>
+                                <p>Default Program: @Html.DisplayFor(modelItem => item.IsDefault)</p>
+                            </div>
+                        </div>
+
+                        <br />
+                    
+                        @* Exercises are created as a separate list within the query on the backend, so these must be unpacked individually *@
+                        <h3 class="card-title hidden">Exercises </h3>
+
+                        <div class="exercisesContainer">
+                            @* // create a div exercise-item *@
+                            @* // Include details *@
+                        </div> 
+
+                </div>
+            </div>
+
+    </div>
+</div>
+}
+
+<script src="~/js/workoutProgram_index.js"></script>

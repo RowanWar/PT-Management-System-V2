@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PT_Management_System_V2.Data;
@@ -11,9 +12,11 @@ using PT_Management_System_V2.Data;
 namespace PT_Management_System_V2.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241115154653_AddMuscleGroupTable")]
+    partial class AddMuscleGroupTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1116,28 +1119,26 @@ namespace PT_Management_System_V2.Migrations
                 {
                     b.Property<int>("WorkoutScheduleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("WorkoutScheduleId");
+                        .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WorkoutScheduleId"));
 
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("integer");
 
-                    b.Property<int>("MuscleGroupId")
-                        .HasColumnType("integer");
+                    b.Property<string>("MuscleGroup")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<int>("WorkoutProgramId")
                         .HasColumnType("integer");
 
-                    b.HasKey("WorkoutScheduleId")
-                        .HasName("WorkoutSchedule_pkey");
-
-                    b.HasIndex("MuscleGroupId");
+                    b.HasKey("WorkoutScheduleId");
 
                     b.HasIndex("WorkoutProgramId");
 
-                    b.ToTable("WorkoutProgramSchedules", (string)null);
+                    b.ToTable("GetWorkoutProgramSchedules");
                 });
 
             modelBuilder.Entity("AspNetUserRole", b =>
@@ -1431,19 +1432,11 @@ namespace PT_Management_System_V2.Migrations
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutProgramSchedule", b =>
                 {
-                    b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.MuscleGroup", "MuscleGroup")
-                        .WithMany("WorkoutProgramSchedules")
-                        .HasForeignKey("MuscleGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("PT_Management_System_V2.Data.EntityFrameworkModels.WorkoutProgram", "WorkoutProgram")
                         .WithMany("WorkoutSchedules")
                         .HasForeignKey("WorkoutProgramId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("MuscleGroup");
 
                     b.Navigation("WorkoutProgram");
                 });
@@ -1489,8 +1482,6 @@ namespace PT_Management_System_V2.Migrations
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.MuscleGroup", b =>
                 {
                     b.Navigation("Exercises");
-
-                    b.Navigation("WorkoutProgramSchedules");
                 });
 
             modelBuilder.Entity("PT_Management_System_V2.Data.EntityFrameworkModels.SetCategory", b =>

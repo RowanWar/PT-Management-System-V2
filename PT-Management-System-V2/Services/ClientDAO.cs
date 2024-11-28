@@ -7,7 +7,7 @@ using PT_Management_System_V2.Models;
 
 namespace PT_Management_System_V2.Services;
 
-public class ClientDAO : IClientDataService
+public class ClientDAO /*: IClientDataService*/
 {
 
     private readonly string _dbConnectionString;
@@ -82,7 +82,9 @@ public class ClientDAO : IClientDataService
         var clients = await
         (from cc in _context.CoachClients
          join c in _context.Clients on cc.ClientId equals c.ClientId
-         join u in _context.AspNetUsers on c.UserId equals u.Id // Was WorkoutUserId
+         join wp in _context.WorkoutPrograms on c.WorkoutProgramId equals wp.WorkoutProgramId
+         join u in _context.AspNetUsers on c.UserId equals u.Id
+
          where cc.CoachId == contextCoachId
          select new ClientCoach_Client_ViewModel
          {
@@ -92,6 +94,10 @@ public class ClientDAO : IClientDataService
              ContactByEmail = c.ContactByEmail, 
              Referred = c.Referred,
              Referral = c.Referral,
+             //WorkoutProgramId = c.WorkoutProgramId,
+
+             // WorkoutProgram details
+             WorkoutProgramName = wp.ProgramName,
 
              // CoachClient details
              MonthlyCharge = cc.MonthlyCharge,
@@ -110,9 +116,47 @@ public class ClientDAO : IClientDataService
         return clients;
     }
 
-    public ClientModel GetClientById(int id)
+    public async Task<ClientCoach_Client_ViewModel> GetClientByClientId(int clientId, int contextCoachId)
     {
-        throw new NotImplementedException();
+        using var _context = _contextFactory.CreateDbContext();
+
+        var client = await
+        (from cc in _context.CoachClients
+         join c in _context.Clients on cc.ClientId equals c.ClientId
+         join wp in _context.WorkoutPrograms on c.WorkoutProgramId equals wp.WorkoutProgramId
+         join u in _context.AspNetUsers on c.UserId equals u.Id
+
+         where cc.CoachId == contextCoachId
+         select new ClientCoach_Client_ViewModel
+         {
+            // Client details
+            ClientId = c.ClientId,
+            ContactByPhone = c.ContactByPhone,
+            ContactByEmail = c.ContactByEmail,
+            Referred = c.Referred,
+            Referral = c.Referral,
+            //WorkoutProgramId = c.WorkoutProgramId,
+
+            // WorkoutProgram details
+            WorkoutProgramId = wp.WorkoutProgramId,
+            WorkoutProgramName = wp.ProgramName,
+
+            // CoachClient details
+            MonthlyCharge = cc.MonthlyCharge,
+            ClientStartDate = cc.ClientStartDate,
+            ClientEndDate = cc.ClientEndDate,
+
+            // AspNetUsers details
+            FirstName = u.FirstName,
+            LastName = u.LastName,
+            UserName = u.UserName,
+            Email = u.Email,
+            PhoneNumber = u.PhoneNumber
+         })
+        .FirstOrDefaultAsync();
+
+
+        return client;
     }
 
     public int Insert(ClientModel client)
@@ -130,13 +174,13 @@ public class ClientDAO : IClientDataService
         throw new NotImplementedException();
     }
 
-    List<ClientModel> IClientDataService.GetAllClients()
-    {
-        throw new NotImplementedException();
-    }
+    //List<ClientModel> IClientDataService.GetAllClients()
+    //{
+    //    throw new NotImplementedException();
+    //}
 
-    List<ClientModel> IClientDataService.SearchClients(string searchTerm)
-    {
-        throw new NotImplementedException();
-    }
+    //List<ClientModel> IClientDataService.SearchClients(string searchTerm)
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

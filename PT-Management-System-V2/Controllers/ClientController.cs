@@ -84,6 +84,28 @@ public class ClientController : Controller
     }
 
 
+    // [For Coach] Displays full details of a client based upon the clientId
+    [Authorize(Policy = "CoachPolicy")]
+    [HttpGet()]
+    public async Task<IActionResult> ClientOverview(int clientId)
+    {
+        // Grab the logged in users ID from the user authorization session context
+        var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // Returns the associated coach_id of a provided user_id, if exists
+        var coachId = await _clientDAO.VerifyAndGetUsersCoachId(contextUserId);
+
+        // This error handling needs to be cleaned up to handle if user has no clients vs is not a coach
+        if (coachId == null)
+        {
+            return BadRequest("You are not registered as a coach or lack clients");
+        }
+
+        var clientData = await _clientDAO.GetClientByClientId(clientId, coachId.CoachId);
+
+        return View("ClientOverview", clientData);
+    }
+
 
     [Authorize(Policy = "CoachPolicy")]
     [HttpGet()]
@@ -93,6 +115,7 @@ public class ClientController : Controller
 
         return View("ClientReport", weeklyReport);
     }
+
 
     // [For Coach] Displays details of a specific workout based upon a WorkoutId 
     [Authorize(Policy = "CoachPolicy")]
@@ -104,6 +127,7 @@ public class ClientController : Controller
         // think need to create a different view
         return View("WorkoutDetails", workoutList);
     }
+
 
     //public IActionResult ViewImage(int ReportId)
     //{
