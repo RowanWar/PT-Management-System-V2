@@ -90,6 +90,50 @@ public class WorkoutProgramDAO
 
         return data;
     }
+    
+
+
+    public async Task<bool> DeleteExerciseOnWorkoutProgramId(string contextUserId, int workoutProgramId, int exerciseId)
+    {
+        // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
+        using var _context = _contextFactory.CreateDbContext();
+
+        var exerciseToDelete = await _context.WorkoutProgramExercises
+            .FirstOrDefaultAsync(wpe => wpe.WorkoutProgramId == workoutProgramId && wpe.ExerciseId == exerciseId);
+
+        if (exerciseToDelete == null)
+        {
+            return false;
+        }
+
+        _context.WorkoutProgramExercises.Remove(exerciseToDelete);
+        await _context.SaveChangesAsync();
+
+        // Returns bool as true if succesful in deleting data
+        return true;
+    }
+
+
+    // WORKING HERE
+    public async Task<bool> AddExerciseOnWorkoutProgramId(string contextUserId, int workoutProgramId, int exerciseId)
+    {
+        // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
+        using var _context = _contextFactory.CreateDbContext();
+
+        var exerciseToAdd = await _context.WorkoutProgramExercises
+            .FirstOrDefaultAsync(wpe => wpe.WorkoutProgramId == workoutProgramId && wpe.ExerciseId == exerciseId);
+
+        if (exerciseToAdd == null)
+        {
+            return false;
+        }
+
+        _context.WorkoutProgramExercises.Remove(exerciseToDelete);
+        await _context.SaveChangesAsync();
+
+        // Returns bool as true if succesful in deleting data
+        return true;
+    }
 
 
 
@@ -144,7 +188,7 @@ public class WorkoutProgramDAO
             {
                 WorkoutProgramId = workoutProgramId,
                 DayOfWeek = i % 7, // Cycling through days of the week (0 = Sunday, 6 = Saturday)
-                MuscleGroupId = 1, // Replace with a valid default value or assign dynamically as needed
+                MuscleGroupId = 1, 
             });
         }
 
@@ -152,7 +196,7 @@ public class WorkoutProgramDAO
         await _context.WorkoutProgramSchedules.AddRangeAsync(newSchedules);
         await _context.SaveChangesAsync();
 
-        return true; // Indicate successful operation
+        return true;
     }
 
 }

@@ -1,4 +1,154 @@
-﻿function filterWorkoutPrograms() {
+﻿
+function deleteExercise(exerciseId, workoutProgramId) {
+    const updatedExercise = {
+        exerciseId: Number(exerciseId),
+        workoutProgramId: Number(workoutProgramId)
+    };
+
+    fetch("/WorkoutProgram/DeleteExerciseFromWorkoutProgram", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedExercise)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("Failed to delete exercise");
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log("Exercise deleted successfully:", data);
+        alert("Exercise deleted successfully!");
+    })
+    .catch(error => {
+        console.error("Error deleting exercise:", error);
+        alert("Failed to delete exercise. Please try again.");
+    });
+};
+
+
+function addExercise(exerciseId, workoutProgramId) {
+    const updatedExercise = {
+        exerciseId: Number(exerciseId),
+        workoutProgramId: Number(workoutProgramId)
+    };
+
+    fetch("/WorkoutProgram/AddExerciseToWorkoutProgram", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updatedExercise)
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to add exercise");
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Exercise added successfully:", data);
+            alert("Exercise added successfully!");
+        })
+        .catch(error => {
+            console.error("Error adding exercise:", error);
+            alert("Failed to add exercise. Please try again.");
+        });
+};
+
+
+
+// Handles adding functionality for user to drag or swipe a table row (an exercise within a program) to delete it 
+function addSwipeAndDragToDeleteTableRow() {
+
+    const rows = document.querySelectorAll("tbody tr");
+    console.log(rows);
+    rows.forEach(row => {
+        let startX = 0;
+        let isSwiping = false;
+
+        const startSwipe = (x) => {
+            startX = x;
+            isSwiping = true;
+        };
+
+        const moveSwipe = (x) => {
+            if (isSwiping) {
+                const deltaX = x - startX;
+
+                // Only swipe to the right
+                if (deltaX > 0) {
+                    row.style.transform = `translateX(${deltaX}px)`;
+                }
+            }
+        };
+
+        const endSwipe = (x) => {
+            if (isSwiping) {
+                const deltaX = x - startX;
+
+                // If swiped far enough, delete row
+                if (deltaX > 200) {
+                    // Add deleted class for animation
+                    row.classList.add("deleted"); 
+                    // Remove row after animation
+                    setTimeout(() => row.remove(), 300); 
+
+                    //console.log(row.parentElement);
+                    const exerciseId = row.getAttribute("data-exercise-id");
+
+                    // Gets the workoutProgramId of the exercise swiped based on the nearest parent card-body containing the id as a dataAttribute
+                    const workoutProgramId = row.closest(".card-body").getAttribute("data-workout-program-id");
+
+                    deleteExercise(exerciseId, workoutProgramId);
+                } else {
+                    // Reset position if not swiped far enough
+                    row.style.transform = "translateX(0)";
+                }
+                isSwiping = false;
+            }
+        };
+
+        // Touch Events
+        row.addEventListener("touchstart", (e) => startSwipe(e.touches[0].clientX));
+        row.addEventListener("touchmove", (e) => moveSwipe(e.touches[0].clientX));
+        row.addEventListener("touchend", (e) => endSwipe(e.changedTouches[0].clientX));
+
+        // Mouse Events
+        let mouseDown = false;
+
+        row.addEventListener("mousedown", (e) => {
+            mouseDown = true;
+            startSwipe(e.clientX);
+        });
+
+        row.addEventListener("mousemove", (e) => {
+            if (mouseDown) moveSwipe(e.clientX);
+        });
+
+        row.addEventListener("mouseup", (e) => {
+            if (mouseDown) {
+                mouseDown = false;
+                endSwipe(e.clientX);
+            }
+        });
+
+        row.addEventListener("mouseleave", (e) => {
+            // Cancel swipe if mouse leaves the row
+            if (mouseDown) {
+                e.preventDefault();
+                e.dropEffect = "none";
+                //mouseDown = false;
+                //row.style.transform = "translateX(0)";
+            }
+        });
+    });
+};
+
+
+function filterWorkoutPrograms() {
     const searchBox = document.querySelector("#searchBox");
     const programCards = document.querySelectorAll(".card");
 
@@ -118,10 +268,40 @@ document.addEventListener('DOMContentLoaded', function () {
                             row.appendChild(descriptionCell);
 
                             tbody.appendChild(row);
+
+                            // Assigns a custom data attribute to the generated row of its exerciseId in the db
+                            row.dataset.exerciseId = exercise.exerciseId;
+                            row.dataset.workoutProgramId = exercise.workoutProgramId;
                         });
 
                         table.appendChild(tbody);
                         exercisesContainer.appendChild(table);
+
+                        // Adds an event listener to each row to determine which row has been clicked and if it has been dragged/swiped to initiate deletion
+                        addSwipeAndDragToDeleteTableRow();
+
+
+                        // Add the button below the table
+                        const buttonContainer = document.createElement("div");
+                        buttonContainer.className = "mt-3"; // Add some spacing above the button
+
+                        const addButton = document.createElement("button");
+                        addButton.textContent = " Add New Exercise"; // Space added for the icon
+                        addButton.className = "btn btn-primary w-100 d-flex align-items-center justify-content-center";
+
+                        // Add the + icon
+                        const plusIcon = document.createElement("i");
+                        plusIcon.className = "fas fa-plus me-2"; // Font Awesome icon with margin on the right
+                        addButton.prepend(plusIcon);
+
+                        addButton.addEventListener("click", () => {
+                            console.log("Add New Exercise button clicked for program ID:", workoutProgramId);
+                            // Add your logic here for adding a new exercise
+                        });
+
+                        buttonContainer.appendChild(addButton);
+                        exercisesContainer.appendChild(buttonContainer);
+
 
                         // If fetch request successful, adds its ID to the set to prevent the query from re-running
                         fetchedPrograms.add(workoutProgramId);
@@ -139,17 +319,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Checks if the user clicked inside of the exercise container, if so, prevents the workout program card from being hidden/collapsed
                 if (exercisesContainer && exercisesContainer.contains(e.target)) {
                     console.log("Clicked inside exercisesContainer");
+                    
 
                 } else {
                     console.log("Clicked outside exercisesContainer");
                     toggleExercisesHidden(exercisesContainer, expandableDetails);
 
                 }
-                //toggleExercisesHidden(exercisesContainer, expandableDetails);
-                //console.log(e);
+
             }
             
         })
     })
-    // Initiate an async fetch req to the controller to retrieve the list of exercises associated with each workout program
 });

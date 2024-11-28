@@ -57,39 +57,88 @@ public class WorkoutProgramController : Controller
         // Grab the logged in users ID from the user authorization session context
         var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-
-
-
-
-        // If successful, do next thing
-
-        // Otherwise no valid coach exists and return an oops this doesnt exist status...?
-
-
         List<WorkoutProgram_ViewModel?> workoutPrograms = await _workoutProgramDAO.DisplayPrograms(contextUserId);
 
         return Json(workoutPrograms);
     }
 
+
+    // Utilised for AJAX fetch request to lazy-load exercises within a program once clicked on
     public async Task<IActionResult> ListWorkoutExercises([FromQuery] int workoutProgramId)
     {
         // Grab the logged in users ID from the user authorization session context
         var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-
-
-
-
-        // If successful, do next thing
-
-        // Otherwise no valid coach exists and return an oops this doesnt exist status...?
-
 
         List<Exercise_ViewModel?> programExercises = await _workoutProgramDAO.DisplayExercisesByProgramId(contextUserId, workoutProgramId);
 
         return Json(programExercises);
     }
 
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteExerciseFromWorkoutProgram([FromBody] JsonNode request)
+    {
+
+        // Might need to change these to include data- at the front
+        int workoutProgramId = request["workoutProgramId"]?.GetValue<int>() ?? 0;
+        int exerciseId = request["exerciseId"]?.GetValue<int>() ?? 0;
+
+
+        // Grab the logged in users ID from the user authorization session context
+        var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // If non-valid ID
+        if (workoutProgramId <= 0)
+        {
+            return BadRequest(new { success = false, message = "Invalid or missing program ID!" });
+        }
+
+
+        // Returns a boolean dictating whether the exercise was successfully deleted from the workout program id provided
+        bool isDeleted = await _workoutProgramDAO.DeleteExerciseOnWorkoutProgramId(contextUserId, workoutProgramId, exerciseId);
+
+        if (isDeleted)
+        {
+
+            return Ok(new { success = true, message = "Workout program updated successfully!" });
+        }
+
+
+        return Ok(new { success = false });
+    }
+
+
+    [HttpPost]
+    public async Task<IActionResult> AddExerciseToWorkoutProgram([FromBody] JsonNode request)
+    {
+
+        // Might need to change these to include data- at the front
+        int workoutProgramId = request["workoutProgramId"]?.GetValue<int>() ?? 0;
+        int exerciseId = request["exerciseId"]?.GetValue<int>() ?? 0;
+
+
+        // Grab the logged in users ID from the user authorization session context
+        var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        // If non-valid ID
+        if (workoutProgramId <= 0)
+        {
+            return BadRequest(new { success = false, message = "Invalid or missing program ID!" });
+        }
+
+
+        // Returns a boolean dictating whether the exercise was successfully deleted from the workout program id provided
+        bool isAdded = await _workoutProgramDAO.DeleteExerciseOnWorkoutProgramId(contextUserId, workoutProgramId, exerciseId);
+
+        if (isAdded)
+        {
+
+            return Ok(new { success = true, message = "Workout program updated successfully!" });
+        }
+
+
+        return Ok(new { success = false });
+    }
 
 
     // Updates the workout program assigned to a coach's client 
@@ -117,8 +166,7 @@ public class WorkoutProgramController : Controller
         return Ok(new { success = true, message = "Workout program updated successfully!" });
 
 
-        // Change this to prevent redirection in the JS and instead call the functions to update the frontend manually upon submit button being pressed
-        //return RedirectToAction(actionName: "ClientOverview", controllerName: "Client", routeValues: new {clientId});
+
         // I don't think this is required in this controller. Move this to a seperate thing when modifying the program itself? 
         //if (weeklyFrequency.HasValue)
         //{
@@ -131,38 +179,7 @@ public class WorkoutProgramController : Controller
         //    }
         //}
 
-        //return Ok(new { success = true, message = "Workout program updated successfully!" });
-
-        // Otherwise return not found
-        //return NotFound(new { success = false, message = "Failed to update the workout program!" });
     }
 
-
-
-
-    //[HttpPost]
-    //public IActionResult UpdateClientsWorkoutProgram([FromBody] JsonNode request)
-    //{
-    //    int workoutProgramId = request["workoutProgramId"]?.GetValue<int>() ?? 0;
-    //    //int dayOfWeek = request["dayOfWeek"]?.GetValue<int>() ?? 0;
-    //    //string muscleGroup = request["muscleGroup"]?.GetValue<string>();
-
-    //    // If non-valid ID
-    //    if (workoutProgramId == 0)
-    //    {
-    //        return BadRequest(new { success = false, message = "Invalid or missing program ID!" });
-    //    }
-
-
-    //    // Finds the row containing the day of the week via the PK in WorkoutProgramSchedule table 
-    //    var program = _context.WorkoutPrograms.Find(workoutProgramId);
-    //    if (program != null)
-    //    {
-    //        program.WorkoutProgramId = workoutProgramId;
-    //        _context.SaveChanges();
-    //        return Ok();
-    //    }
-    //    return NotFound();
-    //}
 
 }

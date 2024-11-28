@@ -48,26 +48,17 @@
     cursor: pointer; /* Change cursor to indicate interactivity */
 }
 
-/*.table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    border-radius: 100px;
+/* Swipe animation */
+.swipe-delete {
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-    .table th {
-        padding: 0.8rem;
-        border: 1px solid #ddd;
-        text-align: left;
-        font-size: 1.1rem;
-        border-radius: 100px;
-    }
-    .table td {
-        padding: 0.8rem;
-        border: 1px solid #ddd;
-        text-align: left;
-    }
+.deleted {
+    opacity: 0;
+    pointer-events: none;
+}
 
-.table-striped tbody tr:nth-child(odd) {
-    background-color: #f9f9f9;
-}*/
+.disableSelect {
+    user-select: none;
+    pointer-events: none;
+}
