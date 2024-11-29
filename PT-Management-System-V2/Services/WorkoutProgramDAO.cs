@@ -115,24 +115,54 @@ public class WorkoutProgramDAO
 
 
     // WORKING HERE
-    public async Task<bool> AddExerciseOnWorkoutProgramId(string contextUserId, int workoutProgramId, int exerciseId)
+    public async Task<List<Exercise_ViewModel>> AddExerciseOnWorkoutProgramId(string contextUserId, int workoutProgramId, List<int> exerciseIds)
     {
         // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
         using var _context = _contextFactory.CreateDbContext();
 
-        var exerciseToAdd = await _context.WorkoutProgramExercises
-            .FirstOrDefaultAsync(wpe => wpe.WorkoutProgramId == workoutProgramId && wpe.ExerciseId == exerciseId);
+        //var exercises = await (
+        //    from e in _context.Exercises
+        //    where e.ExerciseId == exerciseId
+        //    select new Exercise_ViewModel
+        //    {
+        //        ExerciseId = e.ExerciseId,
+        //        ExerciseName = e.ExerciseName,
+        //        MuscleGroup = e.MuscleGroup,
+        //        ExerciseDescription = e.Description
+        //    })
+        //    .ToListAsync();
 
-        if (exerciseToAdd == null)
+        var exercises = await _context.Exercises
+            .Where(e => exerciseIds.Contains(e.ExerciseId))
+            .Select(e => new Exercise_ViewModel {
+                ExerciseId = e.ExerciseId,
+                ExerciseName = e.ExerciseName,
+                MuscleGroup = e.MuscleGroup,
+                ExerciseDescription = e.Description
+            })
+            .ToListAsync();
+
+
+        // Confirms at least one exercise ID was found
+        if (!exercises.Any())
         {
-            return false;
+            throw new Exception("No valid exercises found for the provided IDs.");
         }
 
-        _context.WorkoutProgramExercises.Remove(exerciseToDelete);
+        // Iterates through each exerciseId in the exerciseIds list brought in as a parameter
+        var newExercises = exercises.Select(excercise => new WorkoutProgramExercise
+        {
+            WorkoutProgramId = workoutProgramId,
+            ExerciseId = excercise.ExerciseId
+        }).ToList();
+
+
+        await _context.WorkoutProgramExercises.AddRangeAsync(newExercises);
+
         await _context.SaveChangesAsync();
 
-        // Returns bool as true if succesful in deleting data
-        return true;
+        // Returns bool as true if more than one row (exercise) was added
+        return exercises;
     }
 
 

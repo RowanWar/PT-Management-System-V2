@@ -29,18 +29,19 @@ function deleteExercise(exerciseId, workoutProgramId) {
 };
 
 
-function addExercise(exerciseId, workoutProgramId) {
-    const updatedExercise = {
-        exerciseId: Number(exerciseId),
-        workoutProgramId: Number(workoutProgramId)
+function addExercise(exerciseId, workoutProgramId, event) {
+    const AddExercises = {
+        exerciseIds: exerciseId,
+        workoutProgramId: workoutProgramId
     };
+
 
     fetch("/WorkoutProgram/AddExerciseToWorkoutProgram", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(updatedExercise)
+        body: JSON.stringify(AddExercises)
     })
         .then(response => {
             if (!response.ok) {
@@ -51,6 +52,31 @@ function addExercise(exerciseId, workoutProgramId) {
         .then(data => {
             console.log("Exercise added successfully:", data);
             alert("Exercise added successfully!");
+
+            const tbody = document.querySelector(`tbody[data-workout-program-id="${workoutProgramId}"]`);
+            console.log(data.data);
+            // Create and append the new table elements for each exercise
+            data.exercises.forEach(exercise => {
+                const row = document.createElement("tr");
+
+                // Create and append table cells for each property
+                const exerciseNameCell = document.createElement("td");
+                exerciseNameCell.textContent = exercise.exerciseName;
+                row.appendChild(exerciseNameCell);
+
+                const muscleGroupCell = document.createElement("td");
+                muscleGroupCell.textContent = exercise.muscleGroup;
+                row.appendChild(muscleGroupCell);
+
+                const descriptionCell = document.createElement("td");
+                descriptionCell.textContent = exercise.exerciseDescription;
+                row.appendChild(descriptionCell);
+
+                tbody.appendChild(row);
+
+                // Assigns a custom data attribute to the generated row of its exerciseId in the db
+                row.dataset.exerciseId = exercise.exerciseId;
+            })
         })
         .catch(error => {
             console.error("Error adding exercise:", error);
@@ -195,6 +221,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log(fetchedPrograms);
     // Iterate through each program and add an event listener which is used to lazy-load exercises related to a workout program
     workoutPrograms.forEach(program => {
+        const workoutProgramId = program.getAttribute("data-workout-program-id")
         program.addEventListener("click", function (e) {
             const workoutProgramId = program.dataset.workoutProgramId;
             const exercisesContainer = program.querySelector(".exercisesContainer");
@@ -249,6 +276,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
                         const tbody = document.createElement("tbody");
+                        //tbody.dataset.workoutProgramId = exercise.workoutProgramId;
 
                         // Create and append the new table elements for each exercise
                         exercises.forEach(exercise => {
@@ -268,10 +296,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             row.appendChild(descriptionCell);
 
                             tbody.appendChild(row);
-
+                            tbody.dataset.workoutProgramId = workoutProgramId;
                             // Assigns a custom data attribute to the generated row of its exerciseId in the db
                             row.dataset.exerciseId = exercise.exerciseId;
-                            row.dataset.workoutProgramId = exercise.workoutProgramId;
+                            //row.dataset.workoutProgramId = exercise.workoutProgramId; // This is broken need to get the program id from the card body
                         });
 
                         table.appendChild(tbody);
@@ -294,14 +322,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         plusIcon.className = "fas fa-plus me-2"; // Font Awesome icon with margin on the right
                         addButton.prepend(plusIcon);
 
-                        addButton.addEventListener("click", () => {
+                        addButton.addEventListener("click", (event) => {
                             console.log("Add New Exercise button clicked for program ID:", workoutProgramId);
-                            // Add your logic here for adding a new exercise
+                            addExercise([1], workoutProgramId, event);
+
+                            
                         });
 
                         buttonContainer.appendChild(addButton);
                         exercisesContainer.appendChild(buttonContainer);
-
+                        addButton.dataset.workoutProgramId = workoutProgramId;
 
                         // If fetch request successful, adds its ID to the set to prevent the query from re-running
                         fetchedPrograms.add(workoutProgramId);
