@@ -38,4 +38,7 @@ public class Exercise_ViewModel
     public string ExerciseName { get; set; }
     public string MuscleGroup { get; set; }
     public string ExerciseDescription { get; set; }
+    public bool IsDefault { get; set; }
+
+    public string UserId { get; set; }
 }

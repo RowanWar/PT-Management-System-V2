@@ -378,13 +378,19 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .HasColumnName("exercise_name");
             entity.Property(e => e.IsDefault).HasColumnName("is_default");
 
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId).HasColumnName("UserId");
 
             entity.HasOne(e => e.ExerciseMuscleGroup)
-              .WithMany(mg => mg.Exercises)
-              .HasForeignKey(e => e.MuscleGroupId)
-              .OnDelete(DeleteBehavior.Restrict)
-              .HasConstraintName("FK_Exercise_MuscleGroup");
+                .WithMany(mg => mg.Exercises)
+                .HasForeignKey(e => e.MuscleGroupId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_Exercise_MuscleGroup");
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade) 
+                .HasConstraintName("FK_Exercise_AspNetUsers");
         });
 
         modelBuilder.Entity<MuscleGroup>(entity =>

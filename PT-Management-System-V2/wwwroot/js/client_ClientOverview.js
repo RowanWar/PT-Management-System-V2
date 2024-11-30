@@ -166,7 +166,7 @@ function showNotification(message, isSuccess = true) {
     notification.textContent = message;
     notification.className = isSuccess ? "success show" : "error show";
 
-    // Automatically hide the notification after 3 seconds
+    // Automatically hide the notification after 2 seconds
     setTimeout(() => {
         notification.className = "hidden";
     }, 2000);

@@ -120,18 +120,6 @@ public class WorkoutProgramDAO
         // Uses the factory db context to create a new instance of ApplicationDbContext on every query, which has the advantage of self-maintaining service lifetime for independency
         using var _context = _contextFactory.CreateDbContext();
 
-        //var exercises = await (
-        //    from e in _context.Exercises
-        //    where e.ExerciseId == exerciseId
-        //    select new Exercise_ViewModel
-        //    {
-        //        ExerciseId = e.ExerciseId,
-        //        ExerciseName = e.ExerciseName,
-        //        MuscleGroup = e.MuscleGroup,
-        //        ExerciseDescription = e.Description
-        //    })
-        //    .ToListAsync();
-
         var exercises = await _context.Exercises
             .Where(e => exerciseIds.Contains(e.ExerciseId))
             .Select(e => new Exercise_ViewModel {

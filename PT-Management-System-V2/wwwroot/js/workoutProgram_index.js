@@ -1,4 +1,111 @@
-﻿
+﻿// Stores a GLOBAL list of exercise IDs that the user has clicked on to be added to their workout
+let selectedExerciseIds = [];
+function activeRows(tableData) {
+    const tdId = tableData.getAttribute("data-exercise-id");
+    //const tdId = td.id;
+    const tdIndex = selectedExerciseIds.indexOf(tdId);
+
+    if (tdIndex === -1) {
+        selectedExerciseIds.push(tdId);
+        tableData.style.background = "aqua";
+    }
+    else {
+        selectedExerciseIds.splice(tdIndex, 1);
+        tableData.style.background = "white";
+    }
+    console.log('Clicked rows: ', selectedExerciseIds);
+};
+
+function addExerciseBtnClicked(workoutProgramId) {
+    //event.preventDefault();
+
+    fetch('/Workout/ViewExerciseList')
+        .then(response => response.json())
+        .then(data => {
+            // Causes the modal to pop-up upon SQL query returning succesfully
+            modal.style.display = "block";
+
+            // Tells JS to expect and parse as a Json obj.
+            var jsonArr = JSON.parse(data);
+
+            let modalContent = document.querySelector(".dynamic-content");
+            let generateTable = document.createElement("table");
+
+
+            generateTable.setAttribute("id", "DynamicExerciseTable");
+            modalContent.appendChild(generateTable);
+
+
+            // Iterates through each exercise and displays it within its own table row attribute
+            for (let i = 0; i < jsonArr.length; i++) {
+                //console.log(jsonArr[i]);
+
+                let exerciseName = jsonArr[i]["ExerciseName"];
+                let exerciseId = jsonArr[i]["ExerciseId"]
+
+                let newRow = generateTable.insertRow();
+
+                let newCell = newRow.insertCell();
+                newCell.setAttribute("data-exercise-id", exerciseId);
+
+                let addContent = document.createTextNode(exerciseName);
+                newCell.appendChild(addContent);
+
+                // This cannot be a lambda function, as it requires the use of "this" (i.e. referencing itself) to work.
+                newCell.addEventListener("click", function () {
+                    newCell.classList.toggle("highlightCell")
+
+                    console.log(this.getAttribute("data-exercise-id"));
+                    activeRows(this);
+
+                });
+            }
+
+
+            // Dynamically generates the submit exercise button at the bottom of the modal
+            let submitExerciseBtn = document.createElement("button");
+            submitExerciseBtn.setAttribute("id", "submitExerciseBtn");
+
+            
+            submitExerciseBtn.appendChild(document.createTextNode("Submit exercises"));
+            // Attaches an event listener to the submit button with the list of exercise IDs selected and the workoutProgramId that generated the modal pop-up
+            submitExerciseBtn.addEventListener("click", () => {
+                addExercise(selectedExerciseIds, workoutProgramId);
+            });
+
+            // Adds the button to the page as the last child element of the modal pop-up
+            modalContent.after(submitExerciseBtn);
+
+
+        })
+        .catch(error => {
+            console.error('Error fetching exercise list: ', error);
+        });
+
+
+};
+
+let modal = document.getElementById("myModal");
+let btn = document.querySelector("#addExerciseBtn");
+let span = document.querySelector(".close");
+
+// The close button for the modal 
+span.onclick = function () {
+    modal.style.display = "none";
+
+    // Grabs the parent node inside of the modal-content
+    let modalContent = document.querySelector(".dynamic-content");
+    let submitExerciseBtn = document.querySelector("#submitExerciseBtn");
+
+    while (modalContent.firstChild) {
+        modalContent.removeChild(modalContent.firstChild);
+        submitExerciseBtn.remove();
+    }
+
+};
+
+
+
 function deleteExercise(exerciseId, workoutProgramId) {
     const updatedExercise = {
         exerciseId: Number(exerciseId),
@@ -20,16 +127,17 @@ function deleteExercise(exerciseId, workoutProgramId) {
     })
     .then(data => {
         console.log("Exercise deleted successfully:", data);
-        alert("Exercise deleted successfully!");
+        showNotification('Exercise Deleted!', true);
     })
     .catch(error => {
         console.error("Error deleting exercise:", error);
-        alert("Failed to delete exercise. Please try again.");
+        showNotification('Delete Failed!', false);
     });
 };
 
 
-function addExercise(exerciseId, workoutProgramId, event) {
+// Fetch request sent to controller/db to add exercises to a workout program based on a program ID
+function addExercise(exerciseId, workoutProgramId) {
     const AddExercises = {
         exerciseIds: exerciseId,
         workoutProgramId: workoutProgramId
@@ -50,11 +158,8 @@ function addExercise(exerciseId, workoutProgramId, event) {
             return response.json();
         })
         .then(data => {
-            console.log("Exercise added successfully:", data);
-            alert("Exercise added successfully!");
-
             const tbody = document.querySelector(`tbody[data-workout-program-id="${workoutProgramId}"]`);
-            console.log(data.data);
+
             // Create and append the new table elements for each exercise
             data.exercises.forEach(exercise => {
                 const row = document.createElement("tr");
@@ -76,11 +181,13 @@ function addExercise(exerciseId, workoutProgramId, event) {
 
                 // Assigns a custom data attribute to the generated row of its exerciseId in the db
                 row.dataset.exerciseId = exercise.exerciseId;
+
+                showNotification('Exercise Added!', true);
             })
         })
         .catch(error => {
             console.error("Error adding exercise:", error);
-            alert("Failed to add exercise. Please try again.");
+            showNotification('Adding Exercise Failed!', false);
         });
 };
 
@@ -209,7 +316,26 @@ function toggleExercisesHidden(exercisesContainer, expandableDetails) {
     }
 }
 
+
+function createButton(workoutProgramId, exercisesContainer) {
+    // Add the button below the table
+    const buttonContainer = document.createElement("div");
+    buttonContainer.className = "mt-3"; // Add some spacing above the button
+
+    const addButton = document.createElement("button");
+    addButton.textContent = " Add New Exercise"; // Space added for the icon
+    addButton.className = "btn btn-primary w-100 d-flex align-items-center justify-content-center";
+
+    // on click of submit button, runs function responsible for initiating fetch request (AJAX) to insert new exercise IDs into the program in the db
+    addButton.addEventListener("click", () => addExerciseBtnClicked(workoutProgramId));
+
+    buttonContainer.appendChild(addButton);
+    exercisesContainer.appendChild(buttonContainer);
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
+    
     // Initializes the JS responsible for handling the filtering of workout programs in the search box
     filterWorkoutPrograms();
 
@@ -308,30 +434,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         // Adds an event listener to each row to determine which row has been clicked and if it has been dragged/swiped to initiate deletion
                         addSwipeAndDragToDeleteTableRow();
 
-
-                        // Add the button below the table
-                        const buttonContainer = document.createElement("div");
-                        buttonContainer.className = "mt-3"; // Add some spacing above the button
-
-                        const addButton = document.createElement("button");
-                        addButton.textContent = " Add New Exercise"; // Space added for the icon
-                        addButton.className = "btn btn-primary w-100 d-flex align-items-center justify-content-center";
-
-                        // Add the + icon
-                        const plusIcon = document.createElement("i");
-                        plusIcon.className = "fas fa-plus me-2"; // Font Awesome icon with margin on the right
-                        addButton.prepend(plusIcon);
-
-                        addButton.addEventListener("click", (event) => {
-                            console.log("Add New Exercise button clicked for program ID:", workoutProgramId);
-                            addExercise([1], workoutProgramId, event);
-
-                            
-                        });
-
-                        buttonContainer.appendChild(addButton);
-                        exercisesContainer.appendChild(buttonContainer);
-                        addButton.dataset.workoutProgramId = workoutProgramId;
+                        // Calls a dedicated function to dynamically generate the button used to open the modal containing a list of exercises 
+                        createButton(workoutProgramId, exercisesContainer);
 
                         // If fetch request successful, adds its ID to the set to prevent the query from re-running
                         fetchedPrograms.add(workoutProgramId);

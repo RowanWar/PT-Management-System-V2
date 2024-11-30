@@ -143,7 +143,7 @@ public class WorkoutProgramController : Controller
         }
         catch (Exception ex)
         {
-            // Handle exceptions and return a user-friendly error message
+            
             return StatusCode(500, new { success = false, message = ex.Message });
         }
     }
