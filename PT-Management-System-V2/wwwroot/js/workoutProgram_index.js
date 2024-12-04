@@ -16,9 +16,8 @@ function activeRows(tableData) {
     console.log('Clicked rows: ', selectedExerciseIds);
 };
 
+// Runs when the user clicks the button under a program to add additional exercise(s)
 function addExerciseBtnClicked(workoutProgramId) {
-    //event.preventDefault();
-
     fetch('/Workout/ViewExerciseList')
         .then(response => response.json())
         .then(data => {
@@ -35,10 +34,13 @@ function addExerciseBtnClicked(workoutProgramId) {
             generateTable.setAttribute("id", "DynamicExerciseTable");
             modalContent.appendChild(generateTable);
 
+            //exerciseIdsInProgram = new Set();
 
             // Iterates through each exercise and displays it within its own table row attribute
             for (let i = 0; i < jsonArr.length; i++) {
-                //console.log(jsonArr[i]);
+                console.log(jsonArr[i].ExerciseId);
+
+                //if jsonArr[i].ExerciseId 
 
                 let exerciseName = jsonArr[i]["ExerciseName"];
                 let exerciseId = jsonArr[i]["ExerciseId"]
@@ -326,7 +328,7 @@ function createButton(workoutProgramId, exercisesContainer) {
     addButton.textContent = " Add New Exercise"; // Space added for the icon
     addButton.className = "btn btn-primary w-100 d-flex align-items-center justify-content-center";
 
-    // on click of submit button, runs function responsible for initiating fetch request (AJAX) to insert new exercise IDs into the program in the db
+    // on click of add exercise button, runs function responsible for running query to display list of available exercises that can be added to the program selected
     addButton.addEventListener("click", () => addExerciseBtnClicked(workoutProgramId));
 
     buttonContainer.appendChild(addButton);

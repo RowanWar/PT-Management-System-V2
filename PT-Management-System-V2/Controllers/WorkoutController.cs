@@ -34,11 +34,6 @@ namespace PT_Management_System_V2.Controllers
         }
 
 
-        //// Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
-        //static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
-
-
-        // Commented out for migration
         public IActionResult Index()
         {
             // Grab the logged in users ID from the user authorization session context

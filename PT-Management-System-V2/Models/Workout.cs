@@ -8,7 +8,7 @@ namespace PT_Management_System_V2.Models
         [Key]
         public int WorkoutId { get; set; }
 
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         public string WorkoutName { get; set; }
 

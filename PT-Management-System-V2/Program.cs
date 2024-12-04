@@ -16,10 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var connectionString = builder.Configuration["ConnectionStrings:PtSystemDb"] ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-//void ConfigureDbContextOptions(DbContextOptionsBuilder options)
-//{
-//    options.UseNpgsql(connectionString); // Use your actual database provider here
-//}
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString),
@@ -65,6 +61,13 @@ builder.Services.AddSingleton<WorkoutProgramDAO>(provider =>
     var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
     return new WorkoutProgramDAO(contextFactory);
 });
+
+builder.Services.AddSingleton<FindCoachDAO>(provider =>
+{
+    var contextFactory = provider.GetRequiredService<IDbContextFactory<ApplicationDbContext>>();
+    return new FindCoachDAO(contextFactory);
+});
+
 
 // Service dedicated to handling the generation of JWT tokens after successful user login/authentication
 builder.Services.AddScoped<JwtTokenService>();

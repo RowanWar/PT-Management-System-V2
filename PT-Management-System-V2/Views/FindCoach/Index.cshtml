@@ -1,0 +1,22 @@
+﻿@model IEnumerable<PT_Management_System_V2.Data.ViewModels.FindCoach_ViewModel>
+@* <link rel="stylesheet" href="~/css/client_index.css" /> *@
+<p>
+    <a asp-action"Create">Your active clients</a>
+</p>
+
+<div class="container my-5">
+
+    <div class="row">
+        @foreach (var coach in Model)
+        {
+            <p><strong>First Name:</strong> @coach.CoachFirstName</p>
+            <p><strong>Last name:</strong> @coach.CoachLastName</p>
+            <p><strong>Desc:</strong> @coach.CoachProfileDescription</p>
+            <p><strong>Qualifications:</strong> @coach.CoachQualifications</p>
+            <p><strong>Email:</strong> @coach.CoachEmail</p>
+        }
+
+    </div>
+</div>
+
+@* <script src="~/js/client_index.js"></script> *@

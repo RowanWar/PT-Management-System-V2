@@ -105,7 +105,7 @@ public class WorkoutDAO /*: IWorkoutDataService*/
         {
             List<WorkoutExerciseModel> foundWorkouts = new List<WorkoutExerciseModel>();
 
-            string sqlStatement = "SELECT * FROM workout WHERE user_id = @UserId";
+            string sqlStatement = "SELECT * FROM workout WHERE \"UserId\" = @UserId";
 
 
             using (var connection = new NpgsqlConnection(_dbConnectionString))
@@ -132,7 +132,7 @@ public class WorkoutDAO /*: IWorkoutDataService*/
                                 foundWorkouts.Add(new WorkoutExerciseModel
                                 {
                                     WorkoutId = (int)result["workout_id"],
-                                    UserId = (int)result["user_id"],
+                                    UserId = (string)result["UserId"],
                                     WorkoutDate = (DateTime)result["workout_date"],
                                     Duration = (TimeSpan)result["duration"],
                                     CreatedAt = (DateTime)result["created_at"]
