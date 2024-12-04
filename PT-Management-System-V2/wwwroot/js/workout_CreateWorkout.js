@@ -201,7 +201,6 @@ function loadActiveWorkoutExercises(activeWorkoutObj) {
 
     // Iterate through each item in activeWorkoutObj
     activeWorkoutObj.forEach(workout => {
-        console.log(workout);
 
         // Only create a header row if one does not already currently exist for this WorkoutExerciseId (1 header only per exercise)
         if (!processedWorkoutExerciseIds.has(workout["WorkoutExerciseId"])) {
@@ -287,7 +286,7 @@ function queryActiveWorkoutExercises() {
         .then(data => {
             // Caches the retrieved workout data into localstorage to prevent multiple API requests to the database upon page refresh
             localStorage.setItem("cachedWorkout", data);
-
+            
             let parsedWorkoutObj = JSON.parse(data)
             // Loads from local storage the sets the user has marked as completed. This must be done here at the end of the promise chain, or else returns null elements in query selector.
             loadActiveWorkoutExercises(parsedWorkoutObj)
@@ -324,7 +323,7 @@ function addExerciseBtnClicked() {
         .then(data => {
             // Causes the modal to pop-up upon SQL query returning succesfully
             modal.style.display = "block";
-
+            console.log(data);
             // Tells JS to expect and parse as a Json obj.
             var jsonArr = JSON.parse(data);
 

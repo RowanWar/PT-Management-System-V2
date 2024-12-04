@@ -43,6 +43,11 @@
             </div>
         </nav>
     </header>
+
+    @* Notification partial view *@
+    @await Html.PartialAsync("_Notification")
+
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -58,5 +63,10 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+
+    @* JS for notification partial view *@
+    <script src="js/shared/notification.js"></script>
 </body>
 </html>
+

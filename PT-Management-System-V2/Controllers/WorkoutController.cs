@@ -34,11 +34,6 @@ namespace PT_Management_System_V2.Controllers
         }
 
 
-        //// Create a list out of the workout model so the forEach in the .cshtml can iterate through all the workouts properly.
-        //static List<WorkoutExerciseModel> workouts = new List<WorkoutExerciseModel>();
-
-
-        // Commented out for migration
         public IActionResult Index()
         {
             // Grab the logged in users ID from the user authorization session context
@@ -169,16 +164,20 @@ namespace PT_Management_System_V2.Controllers
 
         //Responds to a fetch request, providing a list of exercises from within the "exercise" table in the db
         //Passes in the UserId within the query to also display any custom exercises created by that user in the db
-        public IActionResult ViewExerciseList()
+        public async Task<IActionResult> ViewExerciseList()
         {
-            List<ExerciseModel> exerciseList = _workoutDAO.GetAllExercisesByUserId();
+            // Grab the logged in users ID from the user authorization session context
+            var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+
+            List<Exercise_ViewModel> exerciseList = await _workoutDAO.GetAllExercisesByUserId(contextUserId);
 
             string resultSerialized = JsonSerializer.Serialize(exerciseList);
 
 
             return Json(resultSerialized);
-        }   
-        
+        }
+
 
         public async Task<IActionResult> CheckForActiveWorkout()
         {

@@ -105,7 +105,7 @@ public class WorkoutDAO /*: IWorkoutDataService*/
         {
             List<WorkoutExerciseModel> foundWorkouts = new List<WorkoutExerciseModel>();
 
-            string sqlStatement = "SELECT * FROM workout WHERE user_id = @UserId";
+            string sqlStatement = "SELECT * FROM workout WHERE \"UserId\" = @UserId";
 
 
             using (var connection = new NpgsqlConnection(_dbConnectionString))
@@ -132,7 +132,7 @@ public class WorkoutDAO /*: IWorkoutDataService*/
                                 foundWorkouts.Add(new WorkoutExerciseModel
                                 {
                                     WorkoutId = (int)result["workout_id"],
-                                    UserId = (int)result["user_id"],
+                                    UserId = (string)result["UserId"],
                                     WorkoutDate = (DateTime)result["workout_date"],
                                     Duration = (TimeSpan)result["duration"],
                                     CreatedAt = (DateTime)result["created_at"]
@@ -918,68 +918,35 @@ public class WorkoutDAO /*: IWorkoutDataService*/
 
 
 
-    public List<ExerciseModel> GetAllExercisesByUserId()
+    public async Task<List<Exercise_ViewModel>> GetAllExercisesByUserId(string contextUserId)
     {
-        List<ExerciseModel> foundExercises = new List<ExerciseModel>();
-
-   
-        string sqlStatement = "SELECT * FROM exercise LIMIT 300";
-
-
-        using (var connection = new NpgsqlConnection(_dbConnectionString))
+        try
         {
-            try
-            {
-                // Open the connection
-                connection.Open();
+            using var _context = _contextFactory.CreateDbContext();
 
-
-                // Create a command object
-                using (var cmd = new NpgsqlCommand(sqlStatement, connection))
+            // LINQ query to fetch the exercises
+            var foundExercises = await _context.Exercises
+                // Filter for exercises based on whether they're marked as default exercises or are custom exercises created by the user themselves
+                .Where(e => e.IsDefault == true || e.UserId == contextUserId) 
+                .Take(300) // Equivalent to LIMIT 300
+                .Select(e => new Exercise_ViewModel
                 {
-                    //cmd.Parameters.AddWithValue("@UserId", UserId);
-                    var result = cmd.ExecuteReader();
-                    //int val;
+                    ExerciseId = e.ExerciseId,
+                    ExerciseName = e.ExerciseName,
+                    MuscleGroup = e.MuscleGroup,
+                    ExerciseDescription = e.Description,
+                    IsDefault = e.IsDefault,
+                    UserId = e.UserId
+                })
+                .ToListAsync();
 
-                    System.Diagnostics.Debug.WriteLine($"Query result: {result}");
-
-                    if (result.HasRows)
-                    {
-                        while (result.Read())
-                        {
-                            //val = (int)result.GetValue(0);
-                            foundExercises.Add(new ExerciseModel
-                            {
-                                ExerciseId = (int)result["exercise_id"],
-                                ExerciseName = (string)result["exercise_name"],
-                                MuscleGroup = (string)result["muscle_group"],
-                                Description = (string)result["description"],
-                                IsDefault = (bool)result["is_default"],
-                                // Checks if user_id contains a null value, if so assigns null value to the result instead.
-                                UserId = result["user_id"] is DBNull ? (int?)null : (int)result["user_id"]
-                            });
-
-                        }
-                    }
-                    else
-                    {
-                        System.Diagnostics.Debug.WriteLine("No rows found.");
-
-                    }
-
-                    result.Close();
-                    //return foundClients;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle any errors that might have occurred
-                System.Diagnostics.Debug.WriteLine($"An error occurred: {ex.Message}");
-
-            }
-
-            System.Diagnostics.Debug.WriteLine("Returning fetch request now...");
             return foundExercises;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"An error occurred: {ex.Message}");
+            throw;
+            //return new List<Exercise_ViewModel>();
         }
 
     }

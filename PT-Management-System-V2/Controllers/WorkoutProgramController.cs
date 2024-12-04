@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using PT_Management_System_V2.Data;
 using PT_Management_System_V2.Data.EntityFrameworkModels;
+using PT_Management_System_V2.Data.RequestModels;
 using PT_Management_System_V2.Data.ViewModels;
 using PT_Management_System_V2.Services;
 using System.Security.Claims;
@@ -108,36 +109,43 @@ public class WorkoutProgramController : Controller
     }
 
 
+    // Adds one or more exercises to a workout program based on a list of exerciseId(s) passed to it
     [HttpPost]
-    public async Task<IActionResult> AddExerciseToWorkoutProgram([FromBody] JsonNode request)
+    public async Task<IActionResult> AddExerciseToWorkoutProgram([FromBody] AddExerciseToProgramRequest_Request request)
     {
 
-        // Might need to change these to include data- at the front
-        int workoutProgramId = request["workoutProgramId"]?.GetValue<int>() ?? 0;
-        int exerciseId = request["exerciseId"]?.GetValue<int>() ?? 0;
+        if (request.WorkoutProgramId <= 0)
+        {
+            return BadRequest(new { success = false, message = "Invalid or missing program ID!" });
+        }
+
+        if (request.ExerciseIds == null || !request.ExerciseIds.Any())
+        {
+            return BadRequest(new { success = false, message = "No valid exercises provided!" });
+        }
+
 
 
         // Grab the logged in users ID from the user authorization session context
         var contextUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        // If non-valid ID
-        if (workoutProgramId <= 0)
+        try
         {
-            return BadRequest(new { success = false, message = "Invalid or missing program ID!" });
+            // Returns a list of details pertaining to the exercises added to this program for dynamic updating/display on the front-end
+            List<Exercise_ViewModel> addedExerciseDetails = await _workoutProgramDAO.AddExerciseOnWorkoutProgramId(contextUserId, request.WorkoutProgramId, request.ExerciseIds);
+
+            return Ok(new
+            {
+                success = true,
+                message = "Exercises added successfully!",
+                exercises = addedExerciseDetails
+            });
         }
-
-
-        // Returns a boolean dictating whether the exercise was successfully deleted from the workout program id provided
-        bool isAdded = await _workoutProgramDAO.DeleteExerciseOnWorkoutProgramId(contextUserId, workoutProgramId, exerciseId);
-
-        if (isAdded)
+        catch (Exception ex)
         {
-
-            return Ok(new { success = true, message = "Workout program updated successfully!" });
+            
+            return StatusCode(500, new { success = false, message = ex.Message });
         }
-
-
-        return Ok(new { success = false });
     }
 
 
