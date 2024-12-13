@@ -186,100 +186,197 @@ function addSetButtonClicked() {
 }
 
 
+//function loadActiveWorkoutExercises(activeWorkoutObj) {
+//    let activeWorkoutContainer = document.querySelector("#activeWorkoutContainer");
+//    let generateTable = document.createElement("table");
+//    generateTable.setAttribute("class", "activeWorkoutTable");
+//    generateTable.setAttribute("class", "container-fluid");
+//    activeWorkoutContainer.appendChild(generateTable);
+
+//    // Tracks the WorkoutExerciseIds that we have already processed, preventing them from being added twice
+//    let processedWorkoutExerciseIds = new Set();
+
+
+//    // Iterate through each item in activeWorkoutObj
+//    activeWorkoutObj.forEach(workout => {
+
+//        // Only create a header row if one does not already currently exist for this WorkoutExerciseId (1 header only per exercise)
+//        if (!processedWorkoutExerciseIds.has(workout["WorkoutExerciseId"])) {
+//            // Mark this WorkoutExerciseId as processed
+//            processedWorkoutExerciseIds.add(workout["WorkoutExerciseId"]);
+
+//            // Create a new header row for each exercise i.e. "Barbell rows"
+//            let newRowHead = generateTable.insertRow();
+//            newRowHead.className = "headerRow";
+//            newRowHead.setAttribute("headerworkoutexerciseid", workout["WorkoutExerciseId"]);
+//            newRowHead.addEventListener("click", collapseExerciseSets);
+
+//            //let newCellHeadSetsCount = newRowHead.insertCell();
+//            let newCellHeadExerciseName = newRowHead.insertCell();
+
+//            let cellExerciseName = workout["ExerciseName"];
+//            //let cellNoOfSetsValue = workout["SetsCount"];
+
+//            let textNodeExerciseName = document.createTextNode(cellExerciseName);
+//            //let textNodeSets = document.createTextNode(cellNoOfSetsValue);
+
+//            //newCellHeadSetsCount.appendChild(textNodeSets);
+//            newCellHeadExerciseName.appendChild(textNodeExerciseName);
+
+//            // Generate the button which marks a set as complete
+//            let addSetButton = document.createElement("button");
+//            addSetButton.setAttribute("class", "setButton");
+//            addSetButton.addEventListener("click", addSetButtonClicked);
+//            newRowHead.appendChild(addSetButton);
+//        }
+
+//        // Create a new row for each set of the workout
+//        let newRow = generateTable.insertRow();
+
+
+//        newRow.setAttribute("class", "exerciseRow");
+//        newRow.setAttribute("workoutexerciseid", workout["WorkoutExerciseId"]);
+//        newRow.setAttribute("data-setid", workout["SetId"])
+
+//        let weightPerSet = workout["Weight"];
+//        let repsPerSet = workout["Reps"];
+//        let setCategory = workout["SetCategory"];
+
+
+//        let categoryCell = newRow.insertCell();
+//        let weightCell = newRow.insertCell();
+//        let repsCell = newRow.insertCell();
+
+
+//        categoryCell.appendChild(document.createTextNode(setCategory));
+//        weightCell.appendChild(document.createTextNode(weightPerSet));
+//        // Used to uniquely identify the td for localstorage + database updates.
+//        weightCell.setAttribute("data-weight-setid", workout["SetId"]);
+//        weightCell.classList.add("weight-cell");
+//        weightCell.setAttribute("contenteditable", "true");
+//        weightCell.addEventListener("keyup", handleSetDataLocalStorage);
+
+
+//        repsCell.appendChild(document.createTextNode(repsPerSet));
+//        // Used to uniquely identify the td for localstorage + database updates.
+//        repsCell.setAttribute("data-reps-setid", workout["SetId"]);
+//        repsCell.classList.add("reps-cell");
+
+//        repsCell.setAttribute("contenteditable", "true");
+//        repsCell.addEventListener("keyup", handleSetDataLocalStorage)
+
+
+//        // Generate the button which marks a set as complete
+//        let setButton = document.createElement("button");
+//        setButton.setAttribute("class", "setButton");
+//        setButton.addEventListener("click", setButtonClicked);
+//        newRow.appendChild(setButton);
+
+
+//        // Generate the button which deletes a set
+//        let deleteSetButton = document.createElement("button");
+//        deleteSetButton.setAttribute("class", "deleteSetButton");
+//        deleteSetButton.addEventListener("click", deleteButtonClicked);
+//        deleteSetButton.appendChild(document.createTextNode("Del"));
+//        newRow.appendChild(deleteSetButton);
+
+
+
+//    });
+//    // Needs to run outside the above for loop or else it will run wayyy too many times. Loads from localstorage the sets marked as completed after elements have been generated
+//    loadLocalStorage();
+//}
+
 function loadActiveWorkoutExercises(activeWorkoutObj) {
     let activeWorkoutContainer = document.querySelector("#activeWorkoutContainer");
+
+    // Create the table
     let generateTable = document.createElement("table");
-    generateTable.setAttribute("class", "activeWorkoutTable");
+    generateTable.setAttribute("class", "table table-bordered table-striped activeWorkoutTable");
     activeWorkoutContainer.appendChild(generateTable);
 
-    // Dictates the list of columns to be displayed on the page
-    const columnNames = [/*"SetsCount",*/ "WeightPerSet", "RepsPerSet", "SetCategoryArray"];
-
-    // Track the WorkoutExerciseIds we've already processed
+    // Track the WorkoutExerciseIds that have already been processed
     let processedWorkoutExerciseIds = new Set();
-    
 
-    // Iterate through each item in activeWorkoutObj
     activeWorkoutObj.forEach(workout => {
-
-        // Only create a header row if one does not already currently exist for this WorkoutExerciseId (1 header only per exercise)
+        // Create a header row for each unique WorkoutExerciseId
         if (!processedWorkoutExerciseIds.has(workout["WorkoutExerciseId"])) {
-            // Mark this WorkoutExerciseId as processed
             processedWorkoutExerciseIds.add(workout["WorkoutExerciseId"]);
 
-            // Create a new "header" row for each unique WorkoutExerciseId
-            let newRowHead = generateTable.insertRow();
-            newRowHead.className = "headerRow";
-            newRowHead.setAttribute("headerworkoutexerciseid", workout["WorkoutExerciseId"]);
-            newRowHead.addEventListener("click", collapseExerciseSets);
+            let headerRow = generateTable.insertRow();
+            headerRow.setAttribute("class", "headerRow bg-primary text-white");
+            headerRow.setAttribute("headerworkoutexerciseid", workout["WorkoutExerciseId"]);
+            headerRow.addEventListener("click", collapseExerciseSets);
 
-            //let newCellHeadSetsCount = newRowHead.insertCell();
-            let newCellHeadExerciseName = newRowHead.insertCell();
+            // Exercise Name Header Cell
+            let exerciseNameCell = document.createElement("td");
+            exerciseNameCell.setAttribute("colspan", "3"); // Spans all columns
+            exerciseNameCell.textContent = workout["ExerciseName"];
+            exerciseNameCell.addEventListener("click", collapseExerciseSets);
+            headerRow.appendChild(exerciseNameCell);
 
-            let cellExerciseName = workout["ExerciseName"];
-            //let cellNoOfSetsValue = workout["SetsCount"];
-
-            let textNodeExerciseName = document.createTextNode(cellExerciseName);
-            //let textNodeSets = document.createTextNode(cellNoOfSetsValue);
-
-            //newCellHeadSetsCount.appendChild(textNodeSets);
-            newCellHeadExerciseName.appendChild(textNodeExerciseName);
-
-            // Generate the button which marks a set as complete
+            // Add Set Button Header Cell
+            let addSetButtonCell = document.createElement("td");
             let addSetButton = document.createElement("button");
-            addSetButton.setAttribute("class", "setButton");
+            addSetButton.setAttribute("class", "btn btn-light btn-sm");
+            addSetButton.textContent = "Add Set";
             addSetButton.addEventListener("click", addSetButtonClicked);
-            newRowHead.appendChild(addSetButton);
+            addSetButtonCell.appendChild(addSetButton);
+            headerRow.appendChild(addSetButtonCell);
         }
 
-        // Create a new row for each set of the workout
-        let newRow = generateTable.insertRow();
-        newRow.setAttribute("class", "exerciseRow");
-        newRow.setAttribute("workoutexerciseid", workout["WorkoutExerciseId"]);
-        newRow.setAttribute("data-setid", workout["SetId"])
-        let weightPerSet = workout["Weight"];
-        let repsPerSet = workout["Reps"];
-        let setCategory = workout["SetCategory"];
+        // Create a new row for each set
+        let setRow = generateTable.insertRow();
+        setRow.setAttribute("class", "exerciseRow");
+        setRow.setAttribute("workoutexerciseid", workout["WorkoutExerciseId"]);
+        setRow.setAttribute("data-setid", workout["SetId"]);
 
+        // Category Cell
+        let categoryCell = setRow.insertCell();
+        categoryCell.setAttribute("class", "category-cell");
+        categoryCell.textContent = workout["SetCategory"];
 
-        let weightCell = newRow.insertCell();
-        let repsCell = newRow.insertCell();
-        let categoryCell = newRow.insertCell();
-
-        categoryCell.appendChild(document.createTextNode(setCategory));
-        weightCell.appendChild(document.createTextNode(weightPerSet));
-        // Used to uniquely identify the td for localstorage + database updates.
-        weightCell.setAttribute("data-weight-setid", workout["SetId"])
+        // Weight Cell
+        let weightCell = setRow.insertCell();
+        weightCell.setAttribute("class", "weight-cell text-center");
+        weightCell.setAttribute("data-weight-setid", workout["SetId"]);
         weightCell.setAttribute("contenteditable", "true");
+        weightCell.textContent = workout["Weight"];
         weightCell.addEventListener("keyup", handleSetDataLocalStorage);
 
-        repsCell.appendChild(document.createTextNode(repsPerSet));
-        // Used to uniquely identify the td for localstorage + database updates.
-        repsCell.setAttribute("data-reps-setid", workout["SetId"])
+        // Reps Cell
+        let repsCell = setRow.insertCell();
+        repsCell.setAttribute("class", "reps-cell text-center");
+        repsCell.setAttribute("data-reps-setid", workout["SetId"]);
         repsCell.setAttribute("contenteditable", "true");
-        repsCell.addEventListener("keyup", handleSetDataLocalStorage)
+        repsCell.textContent = workout["Reps"];
+        repsCell.addEventListener("keyup", handleSetDataLocalStorage);
 
+        // Mark Complete Button Cell
+        let markCompleteCell = setRow.insertCell();
+        markCompleteCell.setAttribute("data-setid", workout["SetId"]);
 
-        // Generate the button which marks a set as complete
         let setButton = document.createElement("button");
-        setButton.setAttribute("class", "setButton");
+        setButton.setAttribute("class", "btn btn-success btn-sm setButton");
+        setButton.textContent = "Complete";
+        //setButton.setAttribute("class", "setButton");
         setButton.addEventListener("click", setButtonClicked);
-        newRow.appendChild(setButton);
+        markCompleteCell.appendChild(setButton);
 
-
-        // Generate the button which deletes a set
-        let deleteSetButton = document.createElement("button");
-        deleteSetButton.setAttribute("class", "deleteSetButton");
-        deleteSetButton.addEventListener("click", deleteButtonClicked);
-        deleteSetButton.appendChild(document.createTextNode("Del Set"));
-        newRow.appendChild(deleteSetButton);
-
-
-        
+        //// Delete Button Cell
+        //let deleteSetCell = setRow.insertCell();
+        //let deleteSetButton = document.createElement("button");
+        //deleteSetButton.setAttribute("class", "btn btn-danger btn-sm");
+        //deleteSetButton.textContent = "Delete";
+        //deleteSetButton.addEventListener("click", deleteButtonClicked);
+        //deleteSetCell.appendChild(deleteSetButton);
     });
-    // Needs to run outside the above for loop or else it will run wayyy too many times. Loads from localstorage the sets marked as completed after elements have been generated
+
+    // Load completed sets from localStorage
     loadLocalStorage();
 }
+
+
 function queryActiveWorkoutExercises() {
     fetch('/Workout/ViewActiveWorkoutByUserId')
         .then(response => response.json())
@@ -323,12 +420,12 @@ function addExerciseBtnClicked() {
         .then(data => {
             // Causes the modal to pop-up upon SQL query returning succesfully
             modal.style.display = "block";
-            console.log(data);
+
             // Tells JS to expect and parse as a Json obj.
             var jsonArr = JSON.parse(data);
 
-            let modalContent = document.querySelector(".dynamic-content");
 
+            let modalContent = document.querySelector(".dynamic-content");
             let generateTable = document.createElement("table");
             generateTable.setAttribute("id", "DynamicExerciseTable");
             modalContent.appendChild(generateTable);
@@ -348,14 +445,14 @@ function addExerciseBtnClicked() {
                 let addContent = document.createTextNode(exerciseName);
                 newCell.appendChild(addContent);
 
+                
+
                 // This cannot be a lambda function, as it requires the use of "this" (i.e. referencing itself) to work.
                 newCell.addEventListener("click", function () {
                     newCell.classList.toggle("highlightCell")
                     
                     console.log(this.getAttribute("data-exercise-id"));
                     activeRows(this);
-                    //this.style.background = "aqua";
-
                 });
             }
 
@@ -455,10 +552,11 @@ function addTimeToTimer() {
 
 let setCompleteArray = [];
 function setButtonClicked(e) {
-    let parentElem = this.parentElement;
+    let parentElem = this.closest("tr");
     let setId = parentElem.getAttribute("data-setid");
-
-    //console.log(setId);
+    //let newElem = this.closest("tr");
+    //console.log(newElem);
+    console.log(parentElem);
 
     startTimer();
 
@@ -515,9 +613,6 @@ function deleteButtonClicked() {
 
 
 function submitButtonClicked() {
-    //let setsCompleted = localStorage.getItem("setComplete");
-    //console.log(setsCompleted);
-
     let retrieveStorage = localStorage.getItem("setComplete");
     if (retrieveStorage != null) {
         let readJson = JSON.parse(retrieveStorage);
@@ -525,7 +620,7 @@ function submitButtonClicked() {
         let convertJsonToInt = readJson.map(item => Number(item));
         //console.log(convertJsonToInt);
         setCompleteArray = convertJsonToInt;
-        //console.log('Final array: ' + setCompleteArray);
+        console.log('Final array: ' + setCompleteArray);
 
 
         /*var newObj = new Object();*/
@@ -545,11 +640,11 @@ function submitButtonClicked() {
 
                 // Saves a HTML collection object of the children within each row marked as completed in setCompleteArray
                 let childNodes = getRow.children;
-
+                console.log(childNodes);
                 
-                // Grabs the contents (number) of the weight & reps table cell within an exercise row
-                const setWeight = childNodes[0].textContent;
-                const setReps = childNodes[1].textContent;
+                // Grabs the contents (number) of the weight & reps table cell within an exercise row based on its index. 
+                const setWeight = childNodes[1].textContent;
+                const setReps = childNodes[2].textContent;
 
 
                 var SetData = {

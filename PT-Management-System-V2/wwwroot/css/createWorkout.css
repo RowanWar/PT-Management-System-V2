@@ -1,10 +1,9 @@
 ﻿body {
 }
 
-/*.table {
-    border-spacing: 50px;
-    padding: 50px;
-}*/
+.activeWorkoutTable {
+    width: 100%;
+}
 
 #activeWorkoutContainer {
     font-size: 1.2em;
@@ -39,9 +38,17 @@
 .exerciseRow>td {
     padding-left: 2em;
 }
-/*tr {*/
-/*    border: 0.1px dotted red;
-*//*}*/
+
+.exerciseRow > td.weight-cell::after {
+    content: " kg";
+    pointer-events: none;
+
+}
+
+.exerciseRow > td.reps-cell::after {
+    content: " reps";
+    pointer-events: none;
+}
 
 #submitExerciseBtn {
     width: 100%;
@@ -77,11 +84,11 @@
         background-color: #218838;
     }
 
-
+/*
 .setButton {
     width: 2em;
     height: 1em;
-}
+}*/
 
 .setComplete {
     background-color: lightgreen;
